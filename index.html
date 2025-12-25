@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy New Year 2026</title>
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at bottom, #020024, #090979, #000);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Center text */
+.text {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+
+/* Main title */
+h1 {
+  font-size: 4rem;
+  background: linear-gradient(90deg, #ff00cc, #3333ff, #00ffcc, #ffcc00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 2s infinite alternate;
+}
+
+/* Year */
+h2 {
+  color: #fff;
+  letter-spacing: 4px;
+  margin-top: 10px;
+}
+
+/* Credit */
+.credit {
+  margin-top: 25px;
+  font-size: 1.1rem;
+  color: #fff;
+  opacity: 0.8;
+  animation: fadeIn 3s ease-in-out infinite alternate;
+}
+
+/* Animations */
+@keyframes glow {
+  from { filter: drop-shadow(0 0 10px #ff00cc); }
+  to { filter: drop-shadow(0 0 25px #00ffcc); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+/* Fireworks */
+.firework {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: explode 2s infinite;
+}
+
+@keyframes explode {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(15); opacity: 0; }
+}
+
+/* Confetti */
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 12px;
+  animation: fall 5s linear infinite;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10vh) rotate(0deg); }
+  100% { transform: translateY(110vh) rotate(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="text">
+  <h1>Happy New Year</h1>
+  <h2>🎉 2026 🎉</h2>
+  <div class="credit">— By Ronnie Ruchal ✨</div>
+</div>
+
+<!-- Fireworks -->
+<div class="firework" style="top:30%; left:40%; background:red;"></div>
+<div class="firework" style="top:20%; left:60%; background:yellow;"></div>
+<div class="firework" style="top:40%; left:70%; background:cyan;"></div>
+
+<!-- Confetti -->
+<script>
+for(let i=0;i<60;i++){
+  let c = document.createElement("div");
+  c.className = "confetti";
+  c.style.left = Math.random()*100+"vw";
+  c.style.background = `hsl(${Math.random()*360},100%,50%)`;
+  c.style.animationDelay = Math.random()*5+"s";
+  document.body.appendChild(c);
+}
+</script>
+
+</body>
+</html>
