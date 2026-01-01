@@ -1,124 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cosmic Defender - Mobile Space Shooter</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<title>Stickman Penalty Tournament V2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+    margin:0;
+    background:#0b3d1c;
+    color:#fff;
+    font-family:Arial;
+    text-align:center;
+}
+canvas{
+    background:#1e7f3f;
+    display:block;
+    margin:auto;
+}
+button{
+    padding:8px 14px;
+    margin:4px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+#ui{padding:10px;font-size:14px}
+.fade{opacity:0.3}
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Start Screen -->
-        <div id="startScreen" class="screen active">
-            <h1><i class="fas fa-rocket"></i> COSMIC DEFENDER</h1>
-            <div class="game-info">
-                <p>Defend the galaxy across 5 challenging levels!</p>
-                <div class="controls-info">
-                    <div class="control-item">
-                        <div class="touch-area"></div>
-                        <span>Move Spaceship</span>
-                    </div>
-                    <div class="control-item">
-                        <button class="shoot-btn"><i class="fas fa-bullseye"></i></button>
-                        <span>Fire Weapon</span>
-                    </div>
-                </div>
-            </div>
-            <button id="startBtn" class="btn"><i class="fas fa-play"></i> START MISSION</button>
-            <button id="howToPlayBtn" class="btn secondary"><i class="fas fa-question-circle"></i> HOW TO PLAY</button>
-            <div class="level-select">
-                <h3>Select Level:</h3>
-                <div class="level-buttons">
-                    <button class="level-btn" data-level="1">1</button>
-                    <button class="level-btn" data-level="2">2</button>
-                    <button class="level-btn" data-level="3">3</button>
-                    <button class="level-btn" data-level="4">4</button>
-                    <button class="level-btn" data-level="5">5</button>
-                </div>
-            </div>
-        </div>
 
-        <!-- How to Play Screen -->
-        <div id="howToPlayScreen" class="screen">
-            <h2><i class="fas fa-book"></i> HOW TO PLAY</h2>
-            <div class="instructions">
-                <div class="instruction">
-                    <div class="icon"><i class="fas fa-hand-point-up"></i></div>
-                    <p><strong>Move:</strong> Touch and drag anywhere on screen to move your spaceship</p>
-                </div>
-                <div class="instruction">
-                    <div class="icon"><i class="fas fa-bullseye"></i></div>
-                    <p><strong>Shoot:</strong> Tap the FIRE button or touch the right side of screen to shoot</p>
-                </div>
-                <div class="instruction">
-                    <div class="icon"><i class="fas fa-shield-alt"></i></div>
-                    <p><strong>Health:</strong> Avoid enemy bullets and collisions. You have 3 lives.</p>
-                </div>
-                <div class="instruction">
-                    <div class="icon"><i class="fas fa-star"></i></div>
-                    <p><strong>Power-ups:</strong> Collect stars for extra points and health packs for healing.</p>
-                </div>
-                <div class="instruction">
-                    <div class="icon"><i class="fas fa-trophy"></i></div>
-                    <p><strong>Mission:</strong> Complete all 5 levels by defeating enemy waves and bosses!</p>
-                </div>
-            </div>
-            <button id="backFromHowToBtn" class="btn"><i class="fas fa-arrow-left"></i> BACK</button>
-        </div>
+<h3>⚽ Stickman Penalty Tournament (V2)</h3>
+<div id="ui"></div>
+<canvas id="game" width="360" height="520"></canvas>
 
-        <!-- Game Screen -->
-        <div id="gameScreen" class="screen">
-            <div class="game-header">
-                <div class="stats">
-                    <div class="stat"><i class="fas fa-heart"></i> <span id="lives">3</span></div>
-                    <div class="stat"><i class="fas fa-bullseye"></i> <span id="score">0</span></div>
-                    <div class="stat"><i class="fas fa-layer-group"></i> <span id="level">1</span>/5</div>
-                </div>
-                <button id="pauseBtn" class="icon-btn"><i class="fas fa-pause"></i></button>
-            </div>
-            
-            <canvas id="gameCanvas"></canvas>
-            
-            <div class="controls">
-                <div class="touch-area-info">Touch & drag here to move</div>
-                <button id="shootBtn" class="shoot-btn"><i class="fas fa-bullseye"></i> FIRE</button>
-            </div>
-        </div>
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const ui=document.getElementById("ui");
 
-        <!-- Pause Screen -->
-        <div id="pauseScreen" class="screen">
-            <h2><i class="fas fa-pause"></i> GAME PAUSED</h2>
-            <button id="resumeBtn" class="btn"><i class="fas fa-play"></i> RESUME</button>
-            <button id="restartBtn" class="btn secondary"><i class="fas fa-redo"></i> RESTART LEVEL</button>
-            <button id="quitBtn" class="btn quit"><i class="fas fa-home"></i> QUIT TO MENU</button>
-        </div>
+const teams=[
+"Brazil","Argentina","France","Germany","Spain","Portugal","England","Italy",
+"Netherlands","Belgium","Croatia","Uruguay","Mexico","USA","Japan","Korea",
+"Senegal","Morocco","Nigeria","Ghana","Cameroon","Egypt","Iran","Saudi",
+"Australia","Denmark","Poland","Serbia","Switzerland","Sweden","Chile","Colombia"
+];
 
-        <!-- Level Complete Screen -->
-        <div id="levelCompleteScreen" class="screen">
-            <h2><i class="fas fa-trophy"></i> LEVEL <span id="completedLevel">1</span> COMPLETE!</h2>
-            <div class="score-summary">
-                <p>Enemies defeated: <span id="enemiesDefeated">0</span></p>
-                <p>Score earned: <span id="levelScore">0</span></p>
-                <p>Total score: <span id="totalScore">0</span></p>
-            </div>
-            <button id="nextLevelBtn" class="btn"><i class="fas fa-forward"></i> NEXT LEVEL</button>
-            <button id="menuFromCompleteBtn" class="btn secondary"><i class="fas fa-home"></i> MAIN MENU</button>
-        </div>
+let userTeam=null;
+let roundTeams=[],nextRound=[];
+let matchIndex=0;
+let scoreA=0,scoreB=0,shot=0;
+let state="select";
+let ball={x:180,y:360,dx:0,dy:0,move:false};
+let history=[];
 
-        <!-- Game Over Screen -->
-        <div id="gameOverScreen" class="screen">
-            <h2><i class="fas fa-skull-crossbones"></i> MISSION FAILED</h2>
-            <p class="game-over-text">Your spaceship was destroyed!</p>
-            <div class="final-score">
-                <h3>FINAL SCORE: <span id="finalScore">0</span></h3>
-                <p>Level reached: <span id="finalLevel">1</span></p>
-            </div>
-            <button id="restartGameBtn" class="btn"><i class="fas fa-redo"></i> PLAY AGAIN</button>
-            <button id="menuFromGameOverBtn" class="btn secondary"><i class="fas fa-home"></i> MAIN MENU</button>
-        </div>
-    </div>
+const roundNames={
+32:"Round of 32",
+16:"Round of 16",
+8:"Quarter Final",
+4:"Semi Final",
+2:"Final"
+};
 
-    <script src="script.js"></script>
+function stickman(x,y){
+ctx.strokeStyle="#fff";
+ctx.lineWidth=2;
+ctx.beginPath();
+ctx.arc(x,y-15,8,0,Math.PI*2);
+ctx.moveTo(x,y-7);ctx.lineTo(x,y+20);
+ctx.moveTo(x,y);ctx.lineTo(x-10,y+10);
+ctx.moveTo(x,y);ctx.lineTo(x+10,y+10);
+ctx.moveTo(x,y+20);ctx.lineTo(x-8,y+35);
+ctx.moveTo(x,y+20);ctx.lineTo(x+8,y+35);
+ctx.stroke();
+}
+
+function goalPost(){
+ctx.strokeStyle="#fff";
+ctx.strokeRect(110,80,140,50);
+}
+
+function drawBall(){
+ctx.fillStyle="#fff";
+ctx.beginPath();
+ctx.arc(ball.x,ball.y,6,0,Math.PI*2);
+ctx.fill();
+}
+
+function selectUI(){
+ui.innerHTML="<b>Select Your Team</b><br>";
+teams.forEach(t=>{
+let b=document.createElement("button");
+b.innerText=t;
+b.onclick=()=>{
+userTeam=t;
+roundTeams=[...teams];
+state="play";
+};
+ui.appendChild(b);
+});
+}
+
+function startMatch(){
+scoreA=0;scoreB=0;shot=0;
+state="kick";
+}
+
+function shoot(){
+let goal=Math.random()>0.4;
+ball.move=true;
+ball.dx=(Math.random()*4)-2;
+ball.dy=-5;
+setTimeout(()=>{
+ball.move=false;
+ball.x=180;ball.y=360;
+if(goal){
+if(shot%2===0)scoreA++; else scoreB++;
+}
+shot++;
+if(shot>=10)finishMatch();
+},600);
+}
+
+function finishMatch(){
+let A=roundTeams[matchIndex];
+let B=roundTeams[matchIndex+1];
+let winner=scoreA>=scoreB?A:B;
+let loser =scoreA>=scoreB?B:A;
+nextRound.push(winner);
+history.push(`${A} ${scoreA} - ${scoreB} ${B}`);
+state="result";
+
+setTimeout(()=>{
+matchIndex+=2;
+if(matchIndex>=roundTeams.length){
+roundTeams=[...nextRound];
+nextRound=[];
+matchIndex=0;
+}
+if(roundTeams.length===1){
+ui.innerHTML=`🏆 CHAMPION: ${roundTeams[0]}`;
+state="end";
+}else{
+startMatch();
+}
+},2000);
+}
+
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+if(state==="play"){
+ui.innerHTML=`<b>${roundNames[roundTeams.length]}</b><br>Your Team: ${userTeam}`;
+startMatch();
+}
+
+if(state==="kick"){
+let A=roundTeams[matchIndex];
+let B=roundTeams[matchIndex+1];
+
+ctx.fillText(A,30,30);
+ctx.fillText(B,260,30);
+ctx.fillText(`Score ${scoreA} - ${scoreB}`,140,55);
+
+goalPost();
+stickman(180,380);
+stickman(180,150);
+
+if(ball.move){
+ball.x+=ball.dx;
+ball.y+=ball.dy;
+}
+drawBall();
+
+if(Math.random()>0.97 && !ball.move){
+shoot();
+}
+}
+
+if(state==="result"){
+ctx.fillText(history[history.length-1],70,250);
+}
+
+requestAnimationFrame(draw);
+}
+
+selectUI();
+draw();
+</script>
 </body>
 </html>
