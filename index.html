@@ -2,50 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gully Cricket Scorer Pro</title>
     <style>
         :root { --primary: #1565c0; --four: #ffeb3b; --six: #ff9800; --wicket: #d32f2f; --extra: #4caf50; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; overflow: hidden; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
         .card { background: white; width: 100%; max-width: 450px; height: 95vh; border-radius: 20px; display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; }
-        
         .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .team-name { border: none; font-weight: bold; font-size: 1rem; width: 35%; text-align: center; border-bottom: 1px solid #ddd; color: var(--primary); }
-
-        .score-box { background: var(--primary); color: white; border-radius: 15px; padding: 15px; text-align: center; flex-shrink: 0; }
-        .score-box h1 { font-size: 3.5rem; margin: 0; }
-        
+        .score-box { background: var(--primary); color: white; border-radius: 15px; padding: 12px; text-align: center; flex-shrink: 0; }
+        .score-box h1 { font-size: 3rem; margin: 0; }
         .target-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; flex-shrink: 0; }
-        .target-box { padding: 8px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 0.9rem; border: 1px solid #ddd; background: #fffde7; }
-
+        .target-box { padding: 8px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 0.85rem; border: 1px solid #ddd; background: #fffde7; }
         .history-container { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; padding: 5px; background: #f9f9f9; border-radius: 10px; border: 1px inset #eee; }
-        .over-row { background: white; margin-bottom: 6px; padding: 8px; border-radius: 8px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .over-label { font-weight: bold; min-width: 55px; font-size: 0.75rem; color: #777; border-right: 1px solid #eee; }
-
-        .ball { min-width: 28px; height: 28px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; }
+        .over-row { background: white; margin-bottom: 6px; padding: 8px; border-radius: 8px; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex-wrap: wrap; }
+        .over-label { font-weight: bold; min-width: 50px; font-size: 0.7rem; color: #777; border-right: 1px solid #eee; margin-right: 5px; }
+        .ball { min-width: 28px; height: 28px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; margin-bottom: 2px; }
         .b-4 { background: var(--four); } .b-6 { background: var(--six); color: white; } .b-w { background: var(--wicket); color: white; } .b-ex { background: var(--extra); color: white; }
-
         .controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0; }
         button { padding: 12px 2px; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
         button:active { transform: scale(0.95); }
         .btn-gray { background: #e0e0e0; } .btn-4 { background: var(--four); } .btn-6 { background: var(--six); color: white; } .btn-wd { background: #f57c00; color: white; } .btn-wicket { background: var(--wicket); color: white; grid-column: span 2; } .btn-undo { background: #78909c; color: white; grid-column: span 2; } .btn-action { background: #2e7d32; color: white; grid-column: span 4; padding: 12px; margin-top: 5px; }
-
-        /* Popups */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;}
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 320px; text-align: center; }
-        .modal-content h2 { margin-top: 0; color: var(--primary); }
-        .modal-content button { width: 100%; margin: 8px 0; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 320px; text-align: center; }
+        .modal-content button { width: 100%; margin: 5px 0; }
+        .nb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
 
 <div id="wicket-modal" class="modal">
     <div class="modal-content">
-        <h2>Wicket!</h2>
-        <button onclick="confirmWicket('W', 0, true)">Bold / Catch / LBW</button>
-        <button style="background:#fff3e0" onclick="confirmWicket('RO', 0, true)">Run Out (0 Run)</button>
-        <button style="background:#fff3e0" onclick="confirmWicket('RO1', 1, true)">Run Out (1 Run)</button>
+        <h3>Wicket!</h3>
+        <button onclick="confirmWicket('W', 0, true)">Bold / Catch</button>
+        <button onclick="confirmWicket('RO0', 0, true)">Run Out (0 Run)</button>
+        <button onclick="confirmWicket('RO1', 1, true)">Run Out (1 Run)</button>
+        <button onclick="confirmWicket('RO2', 2, true)">Run Out (2 Runs)</button>
         <button style="background:#333; color:white" onclick="closeModal('wicket-modal')">Cancel</button>
+    </div>
+</div>
+
+<div id="nb-modal" class="modal">
+    <div class="modal-content">
+        <h3>No Ball + Runs?</h3>
+        <div class="nb-grid">
+            <button onclick="addNoBall(0)">NB+0</button>
+            <button onclick="addNoBall(1)">NB+1</button>
+            <button onclick="addNoBall(2)">NB+2</button>
+            <button onclick="addNoBall(3)">NB+3</button>
+            <button class="b-4" onclick="addNoBall(4)">NB+4</button>
+            <button class="b-6" style="background:var(--six); color:white" onclick="addNoBall(6)">NB+6</button>
+        </div>
+        <button style="background:#333; color:white; width:100%; margin-top:10px" onclick="closeModal('nb-modal')">Cancel</button>
     </div>
 </div>
 
@@ -67,8 +75,8 @@
     <div class="score-box">
         <div id="innings-tag" style="font-size: 0.7rem; background:rgba(0,0,0,0.2); padding:2px 10px; border-radius:10px; margin-bottom:5px; display:inline-block">1ST INNINGS</div>
         <h1 id="main-score">0 - 0</h1>
-        <div style="font-size: 1.1rem; margin-top:5px">Overs: <span id="overs-txt">0.0</span></div>
-        <div style="display: flex; justify-content: space-around; font-size: 0.8rem; margin-top: 10px; opacity: 0.9;">
+        <div style="font-size: 1rem; margin-top:5px">Overs: <span id="overs-txt">0.0</span></div>
+        <div style="display: flex; justify-content: space-around; font-size: 0.75rem; margin-top: 10px; opacity: 0.9;">
             <span>CRR: <b id="crr">0.00</b></span>
             <span id="rrr-wrap" style="display:none">RRR: <b id="rrr">0.00</b></span>
         </div>
@@ -88,8 +96,8 @@
         <button class="btn-gray" onclick="addRun(3)">3</button>
         <button class="btn-4" onclick="addRun(4)">4</button>
         <button class="btn-6" onclick="addRun(6)">6</button>
-        <button class="btn-wd" onclick="addExtra('WD')">WD</button>
-        <button class="btn-wd" onclick="addExtra('NB')">NB</button>
+        <button class="btn-wd" onclick="addWide()">WD</button>
+        <button class="btn-wd" style="background:#f57c00" onclick="openModal('nb-modal')">NB</button>
         <button class="btn-wicket" onclick="openModal('wicket-modal')">WICKET</button>
         <button class="btn-undo" onclick="undo()">UNDO</button>
         <button class="btn-action" id="action-btn" onclick="switchInnings()">FINISH INNINGS</button>
@@ -97,8 +105,7 @@
 </div>
 
 <script>
-    let score = 0, wickets = 0, balls = 0, target = 0, innings = 1, maxOvers = 99;
-    let history = [];
+    let score = 0, wickets = 0, balls = 0, target = 0, innings = 1, maxOvers = 99, history = [];
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -108,14 +115,11 @@
         document.getElementById('overs-txt').innerText = `${Math.floor(balls/6)}.${balls%6}`;
         let crr = balls > 0 ? (score / (balls / 6)).toFixed(2) : "0.00";
         document.getElementById('crr').innerText = crr;
-
         if (innings === 2) {
             let need = target - score;
             let ballsLeft = (maxOvers * 6) - balls;
             document.getElementById('need-val').innerText = need > 0 ? need : "0";
             document.getElementById('rrr').innerText = (ballsLeft > 0 && need > 0) ? (need / (ballsLeft / 6)).toFixed(2) : "0.00";
-            
-            // Winner Logic
             if (need <= 0) showWinner(document.getElementById('name2').value + " Won!");
             else if (ballsLeft <= 0 || wickets >= 10) {
                 if (score < target - 1) showWinner(document.getElementById('name1').value + " Won!");
@@ -124,29 +128,54 @@
         }
     }
 
-    function addRun(r) { save(); score += r; balls++; updateLog(r); updateDisplay(); checkInningsEnd(); }
-    function addExtra(type) { save(); score += 1; updateLog(type); updateDisplay(); }
+    function addRun(r) { save(); score += r; balls++; updateLog(r); updateDisplay(); checkEnd(); }
+    
+    function addWide() { save(); score += 1; updateLog('WD'); updateDisplay(); }
+
+    function addNoBall(runs) {
+        save();
+        score += (1 + runs); // 1 for NB + extra runs
+        updateLog('NB' + (runs > 0 ? '+' + runs : ''));
+        updateDisplay();
+        closeModal('nb-modal');
+    }
 
     function confirmWicket(tag, runs, count) {
         save(); score += runs; wickets++; if(count) balls++;
-        updateLog(tag); updateDisplay(); closeModal('wicket-modal');
-        checkInningsEnd();
+        updateLog(tag); updateDisplay(); closeModal('wicket-modal'); checkEnd();
     }
 
-    function checkInningsEnd() {
-        if (innings === 1 && wickets >= 10) switchInnings();
+    function checkEnd() { if (innings === 1 && wickets >= 10) switchInnings(); }
+
+    function updateLog(val) {
+        let isLegal = !isNaN(val) || val === 'W' || val.startsWith('RO');
+        let overNum = isLegal ? Math.floor((balls - 1) / 6) : Math.floor(balls / 6);
+        
+        let container = document.getElementById('over-history');
+        let overId = `over-${overNum}`;
+        let overBox = document.getElementById(overId);
+        if (!overBox) {
+            overBox = document.createElement('div');
+            overBox.className = 'over-row'; overBox.id = overId;
+            overBox.innerHTML = `<div class="over-label">Over ${overNum + 1}</div>`;
+            container.prepend(overBox);
+        }
+        let b = document.createElement('div');
+        let cls = 'ball';
+        if(val == 4 || val == 'NB+4') cls += ' b-4';
+        else if(val == 6 || val == 'NB+6') cls += ' b-6';
+        else if(val.toString().includes('W') || val.toString().includes('RO')) cls += ' b-w';
+        else if(isNaN(val)) cls += ' b-ex';
+        b.className = cls; b.innerText = val; overBox.appendChild(b);
     }
 
     function switchInnings() {
         if (innings === 1) {
-            let playedOvers = Math.ceil(balls / 6);
+            let played = Math.ceil(balls / 6);
             if (wickets >= 10) {
-                let input = prompt("Team All-out भयो! यो म्याच कति ओभरको हो?", playedOvers);
-                maxOvers = input ? parseInt(input) : playedOvers;
-            } else {
-                maxOvers = Math.floor(balls / 6) + (balls % 6 > 0 ? 1 : 0);
-            }
-            
+                let input = prompt("Match kati over ko ho?", played);
+                maxOvers = input ? parseInt(input) : played;
+            } else { maxOvers = played; }
             target = score + 1; innings = 2; score = 0; wickets = 0; balls = 0;
             document.getElementById('over-history').innerHTML = "";
             document.getElementById('target-ui').style.display = "grid";
@@ -158,28 +187,7 @@
         }
     }
 
-    function showWinner(msg) {
-        document.getElementById('win-desc').innerText = msg;
-        openModal('winner-modal');
-    }
-
-    function updateLog(val) {
-        let isBall = !isNaN(val) || val.includes('W') || val.includes('RO');
-        let overNum = Math.floor((balls - (isBall ? 1 : 0)) / 6);
-        let container = document.getElementById('over-history');
-        let overId = `over-${overNum}`;
-        let overBox = document.getElementById(overId);
-        if (!overBox) {
-            overBox = document.createElement('div');
-            overBox.className = 'over-row'; overBox.id = overId;
-            overBox.innerHTML = `<div class="over-label">Over ${overNum + 1}</div>`;
-            container.prepend(overBox);
-        }
-        let b = document.createElement('div');
-        b.className = `ball ${val==4?'b-4':val==6?'b-6':(val.toString().includes('W')||val.toString().includes('RO'))?'b-w':'b-ex'}`;
-        b.innerText = val; overBox.appendChild(b);
-    }
-
+    function showWinner(msg) { document.getElementById('win-desc').innerText = msg; openModal('winner-modal'); }
     function save() { history.push({s:score, w:wickets, b:balls, h:document.getElementById('over-history').innerHTML}); }
     function undo() {
         if (history.length > 0) {
