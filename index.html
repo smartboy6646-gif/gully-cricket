@@ -77,16 +77,14 @@
             gap: 15px;
         }
 
-        /* UPDATED: Ball History Row (Scrollable horizontally for 2 overs) */
         .this-over-container {
             width: 100%;
             overflow-x: auto;
             white-space: nowrap;
             padding-bottom: 5px;
             text-align: center;
-            /* Hide scrollbar but keep functionality */
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
         .this-over-container::-webkit-scrollbar { display: none; }
 
@@ -148,7 +146,7 @@
             box-shadow: 0 3px 0 #b0bec5;
         }
         .key:active { transform: translateY(3px); box-shadow: none; }
-        .key:disabled { opacity: 0.4; pointer-events: none; }
+        .key:disabled { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
         .k-4 { background: #e1f5fe; color: #01579b; border-color: #b3e5fc; box-shadow: 0 3px 0 #81d4fa; }
         .k-6 { background: #fff8e1; color: #ff6f00; border-color: #ffecb3; box-shadow: 0 3px 0 #ffe082; }
         .k-w { background: var(--red); color: white; font-size: 1.1rem; border:none; box-shadow: 0 3px 0 #8e0000; }
@@ -160,9 +158,9 @@
             display: none; justify-content: center; align-items: center; z-index: 100;
         }
         .modal-box {
-            background: white; width: 85%; max-width: 360px;
-            border-radius: 16px; padding: 25px; text-align: center;
-            max-height: 85vh; overflow-y: auto;
+            background: white; width: 95%; max-width: 450px;
+            border-radius: 16px; padding: 20px; text-align: center;
+            max-height: 90vh; overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         .list-item {
@@ -174,7 +172,6 @@
         .run-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 15px; }
         .run-opt { padding: 15px; background: #eceff1; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; }
         
-        /* Result Screen Styles */
         .res-title { font-size: 1.8rem; color: var(--primary); margin: 0 0 10px 0; }
         .res-score { font-size: 2.5rem; font-weight: 800; margin: 10px 0; }
         .res-note { color: #666; margin-bottom: 20px; font-size: 1.1rem; }
@@ -185,9 +182,12 @@
         .setup-screen { position: absolute; inset: 0; background: #fff; z-index: 50; padding: 30px 20px; overflow-y: auto; text-align: center; }
         .inp-team { width: 100%; padding: 14px; margin-bottom: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; font-weight: bold; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        th { text-align: left; background: #f0f0f0; padding: 10px; }
-        td { border-bottom: 1px solid #eee; padding: 10px; }
+        /* SCORECARD TABLE */
+        .sc-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.85rem; }
+        .sc-table th { background: #283593; color: white; text-align: left; padding: 8px; }
+        .sc-table td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+        .sc-table .num { text-align: center; font-weight: bold; }
+        .sc-header-row { background: #f0f0f0; padding: 8px 10px; font-weight: bold; text-align: left; border-radius: 4px; margin: 15px 0 5px 0; border-left: 5px solid var(--accent); }
     </style>
 </head>
 <body>
@@ -226,18 +226,14 @@
 
         <div class="scroll-area">
             <div class="this-over-container">
-                <div class="this-over" id="list-balls">
-                    </div>
+                <div class="this-over" id="list-balls"></div>
             </div>
-
             <div style="flex:1"></div>
             
-            <button class="btn-action" onclick="showScorecard()">
-                📊 View Scorecard
-            </button>
-            <button class="btn-action" style="background:#d32f2f; margin-top:0" onclick="confirmEndInnings()">
-                🛑 End Innings
-            </button>
+            <button class="btn-action" onclick="showScorecard()">📊 View Scorecard</button>
+            <button class="btn-action" style="background:#d32f2f; margin-top:0" onclick="confirmEndInnings()">🛑 End Innings</button>
+            
+            <button onclick="if(confirm('Are you sure you want to start a NEW MATCH? Current progress will be lost.')){ resetMatch(); }" style="background:none; border:none; color:#555; text-decoration:underline; margin-top:15px; padding:10px; cursor:pointer; font-size:0.9rem">♻️ New Match</button>
         </div>
 
         <div class="controls">
@@ -247,10 +243,8 @@
             <button class="key" onclick="run(3)">3</button>
             <button class="key k-4" onclick="run(4)">4</button>
             <button class="key k-6" onclick="run(6)">6</button>
-            
             <button class="key k-ex" onclick="extra('WD')">WD</button>
             <button class="key k-ex" onclick="askNoBall()">NB</button>
-            
             <button class="key k-w" onclick="wicket('BOWLED')">WKT</button>
             <button class="key k-w" style="background:#e65100" onclick="wicket('RUNOUT')">RO</button>
         </div>
@@ -260,17 +254,18 @@
         <h2 style="color:var(--primary); margin-bottom:30px">🏆 Match Setup</h2>
         <input type="text" id="t1-n" class="inp-team" placeholder="Team A Name" value="Team A">
         <div id="pool-1" style="margin-bottom:15px; color:#666; font-size:0.9rem">Players: 0</div>
-        <input type="text" id="add-1" class="inp-team" placeholder="e.g. Prakash, Ronnie, Ale...">
+        <input type="text" id="add-1" class="inp-team" placeholder="e.g. Player1, Player2...">
         <button onclick="addP(1)" class="btn-action" style="width:100%; margin-bottom:30px; background:#555">Add Players</button>
 
         <hr style="margin:20px 0; border:none; border-top:1px solid #ddd">
 
         <input type="text" id="t2-n" class="inp-team" placeholder="Team B Name" value="Team B">
         <div id="pool-2" style="margin-bottom:15px; color:#666; font-size:0.9rem">Players: 0</div>
-        <input type="text" id="add-2" class="inp-team" placeholder="e.g. John, Wick, Neo...">
+        <input type="text" id="add-2" class="inp-team" placeholder="e.g. Player1, Player2...">
         <button onclick="addP(2)" class="btn-action" style="width:100%; margin-bottom:30px; background:#555">Add Players</button>
 
         <button onclick="startToss()" class="btn-action" style="background:var(--green); width:100%; font-size:1.2rem; padding:16px; margin-top:20px">NEXT: TOSS &raquo;</button>
+        <button onclick="clearSavedNames()" style="margin-top:20px; color:red; border:none; background:none;">Clear Saved Names</button>
     </div>
 
     <div id="modal" class="modal-overlay">
@@ -290,43 +285,95 @@
         score: 0, wkts: 0, balls: 0,
         s: null, ns: null, b: null,
         stats: {}, 
-        overHist: [], // Current Over Logic
-        prevOverHist: [], // Previous Over Logic for Display
-        isMatchOver: false
+        overHist: [], 
+        prevOverHist: [],
+        isMatchOver: false,
+        inn1Data: null,
+        matchStarted: false
     };
 
-    // --- SETUP (UPDATED FOR MULTIPLE NAMES) ---
+    // --- LOCAL STORAGE & RECOVERY ---
+    window.onload = () => {
+        // 1. Load Players (Names)
+        const savedPlayers = localStorage.getItem('gullyCricketPlayers');
+        if(savedPlayers) {
+            const data = JSON.parse(savedPlayers);
+            G.tA = data.tA;
+            G.tB = data.tB;
+            document.getElementById('t1-n').value = G.tA.n;
+            document.getElementById('t2-n').value = G.tB.n;
+            updatePoolDisplay(1);
+            updatePoolDisplay(2);
+        }
+
+        // 2. Load Active Game State (Recovery on Refresh)
+        const savedGame = localStorage.getItem('gullyGameState');
+        if(savedGame) {
+            try {
+                const state = JSON.parse(savedGame);
+                if(state.matchStarted) {
+                    G = state;
+                    document.getElementById('setup').style.display = 'none';
+                    if(G.isMatchOver) {
+                        let resultText = "Match Over";
+                        if(G.inn === 2) {
+                            if(G.score >= G.target) resultText = G.bat.n + " Won!";
+                            else if(G.score === G.target - 1) resultText = "Match Tied!";
+                            else resultText = G.bowl.n + " Won!";
+                        }
+                        handleMatchEnd(resultText, true); 
+                    }
+                    updateUI();
+                }
+            } catch(e) { console.error("Save Corrupt", e); }
+        }
+    }
+
+    function saveNames() {
+        G.tA.n = document.getElementById('t1-n').value;
+        G.tB.n = document.getElementById('t2-n').value;
+        localStorage.setItem('gullyCricketPlayers', JSON.stringify({tA: G.tA, tB: G.tB}));
+    }
+
+    function saveState() {
+        localStorage.setItem('gullyGameState', JSON.stringify(G));
+    }
+
+    function clearSavedNames() {
+        if(confirm("Clear all names?")) {
+            localStorage.removeItem('gullyCricketPlayers');
+            location.reload();
+        }
+    }
+
+    function resetMatch() {
+        localStorage.removeItem('gullyGameState');
+        location.reload();
+    }
+
+    // --- SETUP FUNCTIONS ---
+    function updatePoolDisplay(t) {
+        let arr = t===1 ? G.tA.p : G.tB.p;
+        document.getElementById(t===1?'pool-1':'pool-2').innerText = "Players: " + arr.length + " (" + arr.join(", ") + ")";
+    }
+
     function addP(t) {
         let inp = document.getElementById(t===1?'add-1':'add-2');
-        let raw = inp.value;
-        if(!raw) return;
-
-        // Split by comma, trim spaces, remove empty
-        let names = raw.split(',').map(n => n.trim()).filter(n => n.length > 0);
+        let names = inp.value.split(',').map(n => n.trim()).filter(n => n.length > 0);
         let arr = t===1 ? G.tA.p : G.tB.p;
-
-        let addedCount = 0;
-        names.forEach(n => {
-            if(!arr.includes(n)) {
-                arr.push(n);
-                addedCount++;
-            }
-        });
-
-        if(addedCount === 0 && names.length > 0) alert("Players already exist!");
-
+        names.forEach(n => { if(!arr.includes(n)) arr.push(n); });
         inp.value = "";
-        document.getElementById(t===1?'pool-1':'pool-2').innerText = "Players: " + arr.length + " (" + arr.join(", ") + ")";
+        updatePoolDisplay(t);
+        saveNames();
     }
 
     function startToss() {
         if(G.tA.p.length<2 || G.tB.p.length<2) return alert("Min 2 players required per team!");
-        G.tA.n = document.getElementById('t1-n').value;
-        G.tB.n = document.getElementById('t2-n').value;
+        saveNames();
         
-        // Init Stats
+        // Init Empty Stats
         [...G.tA.p, ...G.tB.p].forEach(p => {
-            G.stats[p] = { r:0, b:0, 4:0, 6:0, out:false, bw:0, br:0 };
+            G.stats[p] = { r:0, b:0, 4:0, 6:0, out:false, bw:0, br:0, ballsBowled:0 };
         });
 
         openModal("🪙 Who Won Toss?", [
@@ -346,19 +393,19 @@
     function initGame(winnerIdx, choice) {
         let winner = winnerIdx===1 ? G.tA : G.tB;
         let loser = winnerIdx===1 ? G.tB : G.tA;
-        
         if(choice === 'bat') { G.bat = winner; G.bowl = loser; }
         else { G.bat = loser; G.bowl = winner; }
-
+        
+        G.matchStarted = true;
         document.getElementById('setup').style.display = 'none';
         closeModal();
         startNewInnings();
     }
 
-    // --- INNINGS FLOW ---
     function startNewInnings() {
         G.score = 0; G.wkts = 0; G.balls = 0; 
-        G.overHist = []; G.prevOverHist = []; // Reset history
+        G.overHist = []; G.prevOverHist = []; 
+        saveState();
         
         selectPlayer(`Select Striker (${G.bat.n})`, G.bat.p, (p1) => {
             G.s = p1;
@@ -367,29 +414,27 @@
                 selectPlayer(`Select Bowler (${G.bowl.n})`, G.bowl.p, (p3) => {
                     G.b = p3;
                     updateUI();
+                    saveState();
                 });
             });
         });
     }
 
-    // --- SCORING ---
+    // --- GAME ACTIONS ---
     function run(r) {
         if(G.isMatchOver) return;
         G.score += r; G.balls++;
-        
         let s = G.stats[G.s];
         s.r += r; s.b++;
         if(r===4) s[4]++; if(r===6) s[6]++;
-
         let b = G.stats[G.b];
-        b.br += r; 
-        
+        b.br += r; b.ballsBowled++;
         G.overHist.push(r);
-        
         if(r%2!==0) swap();
         checkOver();
         updateUI();
         checkWinCondition();
+        saveState();
     }
 
     function extra(type) {
@@ -399,6 +444,7 @@
         G.overHist.push(type);
         updateUI();
         checkWinCondition();
+        saveState();
     }
 
     function askNoBall() {
@@ -406,17 +452,11 @@
         let grid = document.createElement('div');
         grid.className = 'run-grid';
         [0,1,2,3,4,6].forEach(r => {
-            let btn = document.createElement('button');
-            btn.className = 'run-opt';
-            btn.innerText = r;
-            btn.onclick = () => resolveNB(r);
-            grid.appendChild(btn);
+            let btn = document.createElement('button'); btn.className = 'run-opt'; btn.innerText = r;
+            btn.onclick = () => resolveNB(r); grid.appendChild(btn);
         });
-        
         let mBody = document.getElementById('m-body');
-        mBody.innerHTML = "<p>Runs off Bat?</p>";
-        mBody.appendChild(grid);
-        
+        mBody.innerHTML = "<p>Runs off Bat?</p>"; mBody.appendChild(grid);
         document.getElementById('m-title').innerText = "No Ball";
         document.getElementById('modal').style.display = 'flex';
         document.getElementById('m-close').style.display = 'block';
@@ -426,24 +466,19 @@
         closeModal();
         G.score += (1 + batRuns);
         G.stats[G.b].br += (1 + batRuns);
-        
         if(batRuns > 0) {
-            let s = G.stats[G.s];
-            s.r += batRuns;
-            s.b++; 
+            let s = G.stats[G.s]; s.r += batRuns; s.b++; 
             if(batRuns===4) s[4]++; if(batRuns===6) s[6]++;
         }
-
         G.overHist.push("NB+" + batRuns);
         if(batRuns%2 !== 0) swap();
         updateUI();
         checkWinCondition();
+        saveState();
     }
 
-    // --- WICKET ---
     function wicket(type) {
         if(G.isMatchOver) return;
-        
         if(type === 'RUNOUT') {
             openModal("Run Out runs?", [
                 {txt:"0 Runs", fn:()=>resolveRO(0)},
@@ -452,61 +487,59 @@
             ]);
             return;
         }
-
         G.wkts++; G.balls++;
         G.stats[G.s].b++; G.stats[G.s].out = true;
-        G.stats[G.b].bw++; G.overHist.push("W");
-        
+        G.stats[G.b].bw++; G.stats[G.b].ballsBowled++;
+        G.overHist.push("W");
         nextBatter();
     }
 
     function resolveRO(runs) {
         closeModal();
         G.score += runs; G.balls++;
-        G.stats[G.s].r += runs; G.stats[G.s].b++;
-        G.stats[G.b].br += runs;
-        
+        G.stats[G.s].r += runs; G.stats[G.s].b++; G.stats[G.s].out = true;
+        G.stats[G.b].br += runs; G.stats[G.b].ballsBowled++;
         if(runs%2!==0) swap();
-        
-        G.wkts++;
-        G.stats[G.s].out = true;
-        G.overHist.push("W(RO)");
+        G.wkts++; G.overHist.push("W(RO)");
         nextBatter();
     }
 
     function nextBatter() {
+        saveState();
         checkWinCondition();
         if(G.isMatchOver) return;
-
-        if(G.wkts >= G.bat.p.length - 1) {
-            handleInningsEnd("All Out");
-            return;
-        }
-
+        if(G.wkts >= G.bat.p.length - 1) { handleInningsEnd("All Out"); return; }
         let avail = G.bat.p.filter(p => !G.stats[p].out && p!==G.ns);
         selectPlayer("New Batsman", avail, (p) => {
-            G.s = p;
-            checkOver();
-            updateUI();
+            G.s = p; checkOver(); updateUI(); saveState();
         });
     }
 
-    // --- FLOW HELPERS ---
     function swap() { [G.s, G.ns] = [G.ns, G.s]; }
     
+    // --- FIXED CHECKOVER LOGIC ---
+    function disableControls(disabled) {
+        document.querySelectorAll('.key').forEach(k => k.disabled = disabled);
+    }
+
     function checkOver() {
+        // If 6 balls are done, handle over change
         if(G.balls%6===0 && G.balls>0) {
+            // BUG FIX: Immediately disable buttons so extra clicks don't register 
+            // to the OLD bowler (preventing 1.1 overs vs 0.5 overs issue)
+            disableControls(true);
+
             swap();
-            
-            // LOGIC CHANGE: Move current over to prev over, clear current
             G.prevOverHist = [...G.overHist]; 
             G.overHist = []; 
-            
             let avail = G.bowl.p.filter(p => p!==G.b);
+            
             setTimeout(() => {
                 selectPlayer("Next Bowler", avail, (p) => {
-                    G.b = p;
-                    updateUI();
+                    G.b = p; 
+                    updateUI(); 
+                    saveState();
+                    disableControls(false); // Re-enable buttons after selection
                 });
             }, 500);
         }
@@ -520,13 +553,21 @@
 
     function confirmEndInnings() {
         if(G.isMatchOver) return;
-        if(confirm("Declare / End Innings manually?")) {
-            handleInningsEnd("Declared");
-        }
+        if(confirm("Declare / End Innings manually?")) { handleInningsEnd("Declared"); }
     }
 
     function handleInningsEnd(reason) {
+        saveState();
         if(G.inn === 1) {
+            G.inn1Data = {
+                score: G.score,
+                wkts: G.wkts,
+                balls: G.balls,
+                batTeam: G.bat,
+                bowlTeam: G.bowl,
+                stats: JSON.parse(JSON.stringify(G.stats)) 
+            };
+            
             G.target = G.score + 1;
             let html = `
                 <div class="res-title">Innings Break</div>
@@ -548,22 +589,31 @@
         closeModal();
         G.inn = 2;
         [G.bat, G.bowl] = [G.bowl, G.bat];
+        
+        // Reset stats for 2nd innings
+        Object.keys(G.stats).forEach(key => {
+            G.stats[key] = { r:0, b:0, 4:0, 6:0, out:false, bw:0, br:0, ballsBowled:0 };
+        });
+
         startNewInnings();
     }
 
-    function handleMatchEnd(resultText) {
+    function handleMatchEnd(resultText, silent=false) {
         G.isMatchOver = true;
-        let html = `
-            <div class="res-title">🏆 Match Over</div>
-            <div class="res-score">${resultText}</div>
-            <button class="btn-green" onclick="location.reload()">New Match</button>
-            <button class="btn-outline" onclick="closeModal()">View Scorecard</button>
-        `;
-        showCustomModal(html);
-        document.querySelectorAll('.key').forEach(k => k.disabled = true);
+        saveState();
+        if(!silent) {
+            let html = `
+                <div class="res-title">🏆 Match Over</div>
+                <div class="res-score" style="font-size:1.8rem">${resultText}</div>
+                <button class="btn-green" onclick="resetMatch()">New Match</button>
+                <button class="btn-outline" onclick="showScorecard()">Final Scorecard</button>
+            `;
+            showCustomModal(html);
+        }
+        disableControls(true);
     }
 
-    // --- UI (UPDATED for Circle display) ---
+    // --- UI UPDATES ---
     function updateUI() {
         document.getElementById('ui-inn').innerText = (G.inn===1 ? "1st" : "2nd") + " Innings";
         document.getElementById('ui-target').innerText = G.target ? ("Target: " + G.target) : "";
@@ -571,7 +621,6 @@
         document.getElementById('sc-runs').innerText = G.score;
         document.getElementById('sc-wkts').innerText = G.wkts;
         document.getElementById('sc-overs').innerText = Math.floor(G.balls/6) + "." + (G.balls%6);
-        
         let crr = G.balls>0 ? (G.score/(G.balls/6)).toFixed(1) : "0.0";
         document.getElementById('sc-crr').innerText = "CRR: " + crr;
 
@@ -590,26 +639,18 @@
         if(G.b) {
             let b = G.stats[G.b];
             document.getElementById('name-b').innerText = G.b;
-            document.getElementById('stat-b').innerText = b.bw + "-" + b.br;
+            // Display balls correctly (e.g. 0.5, 1.0, 1.1)
+            document.getElementById('stat-b').innerText = b.bw + "-" + b.br + " (" + Math.floor(b.ballsBowled/6) + "." + (b.ballsBowled%6) + ")";
         }
 
-        // --- UPDATED BALL RENDER LOGIC ---
         let ballDiv = document.getElementById('list-balls');
         let html = "";
-        
-        // 1. Render Previous Over (if exists) with slightly faded style? 
-        // Or just normal. Let's do normal.
         if (G.prevOverHist.length > 0) {
              html += G.prevOverHist.map(x => makeBall(x)).join('');
-             html += `<div class="over-separator"></div>`; // The Line you asked for
+             html += `<div class="over-separator"></div>`;
         }
-
-        // 2. Render Current Over
         html += G.overHist.map(x => makeBall(x)).join('');
-        
         ballDiv.innerHTML = html;
-        
-        // Scroll to end automatically
         let container = document.querySelector('.this-over-container');
         container.scrollLeft = container.scrollWidth;
     }
@@ -622,31 +663,47 @@
         return `<div class="${cls}">${x}</div>`;
     }
 
+    // --- ENHANCED SCORECARD ---
     function showScorecard() {
-        let h = `<h4>${G.bat.n} Batting</h4><table><tr><th>Name</th><th>R</th><th>B</th></tr>`;
-        G.bat.p.forEach(p => {
-            let s = G.stats[p];
-            if(s.b>0 || p===G.s || p===G.ns || s.out) {
-                h += `<tr><td>${p}${s.out?' <b style="color:red">out</b>':(p===G.s?'*':'')}</td><td>${s.r}</td><td>${s.b}</td></tr>`;
-            }
-        });
-        h += `</table>`;
+        let html = "";
+        let currentTitle = (G.inn === 1) ? "1st Innings (Live)" : "2nd Innings";
+        html += generateInningsTable(currentTitle, G.bat, G.bowl, G.stats, G.score, G.wkts, G.balls);
 
-        h += `<h4>${G.bowl.n} Bowling</h4><table><tr><th>Name</th><th>W</th><th>R</th></tr>`;
-        G.bowl.p.forEach(p => {
-            let s = G.stats[p];
-            if(s.br>0 || s.bw>0 || p===G.b) {
-                h += `<tr><td>${p}</td><td>${s.bw}</td><td>${s.br}</td></tr>`;
-            }
-        });
-        h += "</table>";
-        
-        document.getElementById('m-title').innerText = "Scorecard";
-        document.getElementById('m-body').innerHTML = h;
+        if(G.inn === 2 && G.inn1Data) {
+            html += generateInningsTable("1st Innings", G.inn1Data.batTeam, G.inn1Data.bowlTeam, G.inn1Data.stats, G.inn1Data.score, G.inn1Data.wkts, G.inn1Data.balls);
+        }
+
+        document.getElementById('m-title').innerText = "Match Scorecard";
+        document.getElementById('m-body').innerHTML = html;
         document.getElementById('m-close').style.display = 'block';
         document.getElementById('modal').style.display = 'flex';
     }
 
+    function generateInningsTable(title, batTeam, bowlTeam, statsData, score, wkts, balls) {
+        let h = `<div class="sc-header-row">${title}: ${batTeam.n} - ${score}/${wkts} (${Math.floor(balls/6)}.${balls%6} ov)</div>`;
+        
+        h += `<table class="sc-table"><tr><th>${batTeam.n} Batting</th><th class="num">R</th><th class="num">B</th><th class="num">4s</th><th class="num">6s</th></tr>`;
+        batTeam.p.forEach(p => {
+            let s = statsData[p];
+            if(s.b > 0 || (G.inn===1 && title.includes("Live") && (p === G.s || p === G.ns)) || s.out) {
+                let status = s.out ? '<span style="color:red">out</span>' : ((G.inn===1 && title.includes("Live") && (p===G.s || p===G.ns)) ? '<span style="color:green">*</span>' : 'not out');
+                h += `<tr><td>${p} <br><small>${status}</small></td><td class="num">${s.r}</td><td class="num">${s.b}</td><td class="num">${s[4]}</td><td class="num">${s[6]}</td></tr>`;
+            }
+        });
+        h += `</table>`;
+
+        h += `<table class="sc-table"><tr><th>${bowlTeam.n} Bowling</th><th class="num">O</th><th class="num">R</th><th class="num">W</th></tr>`;
+        bowlTeam.p.forEach(p => {
+            let s = statsData[p];
+            if(s.ballsBowled > 0 || (G.inn===1 && title.includes("Live") && p === G.b)) {
+                h += `<tr><td>${p}</td><td class="num">${Math.floor(s.ballsBowled/6)}.${s.ballsBowled%6}</td><td class="num">${s.br}</td><td class="num">${s.bw}</td></tr>`;
+            }
+        });
+        h += `</table>`;
+        return h;
+    }
+
+    // --- MODAL UTILS ---
     function selectPlayer(title, list, cb) {
         openModal(title, list.map(p => ({ txt:p, fn:() => { closeModal(); cb(p); } })));
     }
@@ -657,9 +714,7 @@
         b.innerHTML = "";
         opts.forEach(o => {
             let d = document.createElement('div');
-            d.className = 'list-item';
-            d.innerText = o.txt;
-            d.onclick = o.fn;
+            d.className = 'list-item'; d.innerText = o.txt; d.onclick = o.fn;
             b.appendChild(d);
         });
         document.getElementById('m-close').style.display = 'none';
@@ -674,7 +729,6 @@
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
 </script>
 </body>
 </html>
