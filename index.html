@@ -151,6 +151,8 @@
         .k-6 { background: #fff8e1; color: #ff6f00; border-color: #ffecb3; box-shadow: 0 3px 0 #ffe082; }
         .k-w { background: var(--red); color: white; font-size: 1.1rem; border:none; box-shadow: 0 3px 0 #8e0000; }
         .k-ex { background: #546e7a; color: white; font-size: 1.1rem; border:none; box-shadow: 0 3px 0 #263238; }
+        /* Undo Button Style */
+        .k-undo { background: #757575; color: white; font-size: 1.5rem; border:none; box-shadow: 0 3px 0 #424242; }
 
         /* --- MODALS --- */
         .modal-overlay {
@@ -247,7 +249,8 @@
             <button class="key k-ex" onclick="askNoBall()">NB</button>
             <button class="key k-w" onclick="wicket('BOWLED')">WKT</button>
             <button class="key k-w" style="background:#e65100" onclick="wicket('RUNOUT')">RO</button>
-        </div>
+            <button class="key k-undo" onclick="undo()">⎌</button>
+            <div style="height:56px"></div> </div>
     </div>
 
     <div id="setup" class="setup-screen">
@@ -291,6 +294,9 @@
         inn1Data: null,
         matchStarted: false
     };
+
+    // --- UNDO STACK ---
+    let undoStack = [];
 
     // --- LOCAL STORAGE & RECOVERY ---
     window.onload = () => {
@@ -351,6 +357,26 @@
         location.reload();
     }
 
+    // --- UNDO LOGIC ---
+    function snap() {
+        // Deep copy the current state before modifying it
+        let snapshot = JSON.parse(JSON.stringify(G));
+        undoStack.push(snapshot);
+        // Keep stack size reasonable (e.g., last 20 actions)
+        if(undoStack.length > 20) undoStack.shift();
+    }
+
+    function undo() {
+        if(undoStack.length === 0) {
+            alert("Nothing to undo!");
+            return;
+        }
+        let prevState = undoStack.pop();
+        G = prevState;
+        saveState();
+        updateUI();
+    }
+
     // --- SETUP FUNCTIONS ---
     function updatePoolDisplay(t) {
         let arr = t===1 ? G.tA.p : G.tB.p;
@@ -405,6 +431,7 @@
     function startNewInnings() {
         G.score = 0; G.wkts = 0; G.balls = 0; 
         G.overHist = []; G.prevOverHist = []; 
+        undoStack = []; // Clear undo stack for new innings
         saveState();
         
         selectPlayer(`Select Striker (${G.bat.n})`, G.bat.p, (p1) => {
@@ -423,6 +450,7 @@
     // --- GAME ACTIONS ---
     function run(r) {
         if(G.isMatchOver) return;
+        snap(); // RECORD HISTORY
         G.score += r; G.balls++;
         let s = G.stats[G.s];
         s.r += r; s.b++;
@@ -439,6 +467,7 @@
 
     function extra(type) {
         if(G.isMatchOver) return;
+        snap(); // RECORD HISTORY
         G.score += 1;
         G.stats[G.b].br += 1;
         G.overHist.push(type);
@@ -464,6 +493,7 @@
 
     function resolveNB(batRuns) {
         closeModal();
+        snap(); // RECORD HISTORY
         G.score += (1 + batRuns);
         G.stats[G.b].br += (1 + batRuns);
         if(batRuns > 0) {
@@ -487,6 +517,7 @@
             ]);
             return;
         }
+        snap(); // RECORD HISTORY
         G.wkts++; G.balls++;
         G.stats[G.s].b++; G.stats[G.s].out = true;
         G.stats[G.b].bw++; G.stats[G.b].ballsBowled++;
@@ -496,6 +527,7 @@
 
     function resolveRO(runs) {
         closeModal();
+        snap(); // RECORD HISTORY
         G.score += runs; G.balls++;
         G.stats[G.s].r += runs; G.stats[G.s].b++; G.stats[G.s].out = true;
         G.stats[G.b].br += runs; G.stats[G.b].ballsBowled++;
@@ -517,7 +549,6 @@
 
     function swap() { [G.s, G.ns] = [G.ns, G.s]; }
     
-    // --- FIXED CHECKOVER LOGIC ---
     function disableControls(disabled) {
         document.querySelectorAll('.key').forEach(k => k.disabled = disabled);
     }
@@ -525,10 +556,7 @@
     function checkOver() {
         // If 6 balls are done, handle over change
         if(G.balls%6===0 && G.balls>0) {
-            // BUG FIX: Immediately disable buttons so extra clicks don't register 
-            // to the OLD bowler (preventing 1.1 overs vs 0.5 overs issue)
             disableControls(true);
-
             swap();
             G.prevOverHist = [...G.overHist]; 
             G.overHist = []; 
@@ -539,7 +567,7 @@
                     G.b = p; 
                     updateUI(); 
                     saveState();
-                    disableControls(false); // Re-enable buttons after selection
+                    disableControls(false); 
                 });
             }, 500);
         }
@@ -639,7 +667,6 @@
         if(G.b) {
             let b = G.stats[G.b];
             document.getElementById('name-b').innerText = G.b;
-            // Display balls correctly (e.g. 0.5, 1.0, 1.1)
             document.getElementById('stat-b').innerText = b.bw + "-" + b.br + " (" + Math.floor(b.ballsBowled/6) + "." + (b.ballsBowled%6) + ")";
         }
 
