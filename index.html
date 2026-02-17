@@ -114,8 +114,7 @@
         .overs-input { width: 100%; padding: 10px; border: 2px solid var(--primary); border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.1rem; }
 
         .full-sc-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; overflow-y: auto; padding: 10px; }
-        .sc-card-container { background: white; max-width: 600px; margin: 0 auto; border-radius: 5px; overflow: hidden; }
-        .sc-header { background: var(--primary); color: white; padding: 10px; text-align: center; font-weight: bold; }
+        .sc-card-container { background: white; max-width: 600px; margin: 0 auto; border-radius: 5px; overflow: hidden; padding:10px; }
         .sc-inning-box { margin-bottom: 10px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
         .sc-inning-title { background: #eee; padding: 5px 10px; font-weight: bold; font-size: 0.9rem; color: #333; display: flex; justify-content: space-between; }
         .sc-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
@@ -126,7 +125,7 @@
         .sc-out-desc { font-size: 0.7rem; color: #888; display: block; }
 
         .home-screen { position: absolute; inset: 0; background: var(--bg-gray); z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .home-logo-container { margin-bottom: 15px; }
+        .home-logo-container { margin-bottom: 15px; text-align: center; }
         .home-logo-img { width: 100px; height: 100px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); object-fit: cover; }
         .home-btn { width: 100%; max-width: 280px; padding: 15px; margin: 8px 0; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 10px; }
         
@@ -153,8 +152,9 @@
     <div id="home-screen" class="home-screen">
         <div class="home-logo-container">
             <img src="Logoap.png" class="home-logo-img" alt="App Logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22red%22/></svg>'">
+            <h1 style="color:var(--primary); margin:10px 0 0 0">Gully Cricket Pro</h1>
+            <p style="color:#666; font-weight:bold; font-size:0.9rem; margin:5px 0 15px 0;">Created by Ronnie Ruchal</p>
         </div>
-        <h1 style="color:var(--primary); margin-top:0">Gully Cricket Pro</h1>
         <button id="btn-resume" class="home-btn" style="background:var(--green); color:white; display:none" onclick="resumeMatch()">▶ Resume Match</button>
         <button class="home-btn" style="background:var(--accent); color:var(--primary)" onclick="startSetup()">Start New Match</button>
         <button class="home-btn" style="background:white; color:#333" onclick="openMatchList()">🔴 Watch Live (No ID)</button>
@@ -281,17 +281,21 @@
             <button class="key k-undo" onclick="undo()">⎌</button>
         </div>
         
-        <div id="watch-msg" style="display:none; position:fixed; bottom:0; width:100%; background:#333; color:white; padding:15px; text-align:center;">
-            🔴 LIVE WATCH MODE
+        <div id="watch-msg" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#333; color:white; padding:15px; text-align:center; z-index:300; box-shadow: 0 -4px 10px rgba(0,0,0,0.5);">
+            <div style="font-weight:bold; color:var(--accent); margin-bottom:8px; font-size:1.1rem;">🔴 LIVE WATCH MODE</div>
+            <button onclick="exitWatchMode()" style="background:#d32f2f; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer; width:90%; max-width:300px;">
+                ⬅ Back to Home
+            </button>
         </div>
     </div>
 
     <div id="full-sc-overlay" class="full-sc-overlay">
-        <div style="text-align:right; max-width:600px; margin:0 auto; padding:5px">
-            <button onclick="document.getElementById('full-sc-overlay').style.display='none'" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px">Close ✖</button>
+        <div style="display:flex; justify-content:space-between; max-width:600px; margin:0 auto; padding:10px 5px">
+            <button id="sc-close-btn" onclick="document.getElementById('full-sc-overlay').style.display='none'" style="background:#d32f2f; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">✖ Close</button>
+            <button id="sc-home-btn" onclick="location.reload()" style="display:none; background:var(--green); color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">🏠 Home Screen</button>
         </div>
         <div id="sc-card-content" class="sc-card-container"></div>
-        <div style="text-align:center; margin-top:15px;">
+        <div style="text-align:center; margin-top:15px; padding-bottom:30px;">
             <button onclick="downloadScorecard()" style="background:#0084ff; color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; font-size:1.1rem; box-shadow:0 4px 10px rgba(0,0,0,0.3)">
                 📥 Download / Share
             </button>
@@ -307,29 +311,26 @@
     </div>
 
 <script>
-    // ==========================================
-    // CRASH FIX: GLOBAL ERROR HANDLER
-    // ==========================================
     window.onerror = function(message, source, lineno, colno, error) {
         console.error("Caught Crash:", message);
         return true; 
     };
 
-    const firebaseConfig = {apiKey: "AIzaSyA4iMak_E4OwmR9UkeITElkT3ZBk8tLO_o",
-  authDomain: "cricketscore-715fe.firebaseapp.com",
-  databaseURL: "https://cricketscore-715fe-default-rtdb.firebaseio.com",
-  projectId: "cricketscore-715fe",
-  storageBucket: "cricketscore-715fe.firebasestorage.app",
-  messagingSenderId: "197101285028",
-  appId: "1:197101285028:web:3b8f2fc780af8a575b8031"
-};
-        // apiKey: "YOUR_API_KEY",
-        // databaseURL: "https://YOUR_ID.firebaseio.com",
-
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4iMak_E4OwmR9UkeITElkT3ZBk8tLO_o",
+      authDomain: "cricketscore-715fe.firebaseapp.com",
+      databaseURL: "https://cricketscore-715fe-default-rtdb.firebaseio.com",
+      projectId: "cricketscore-715fe",
+      storageBucket: "cricketscore-715fe.firebasestorage.app",
+      messagingSenderId: "197101285028",
+      appId: "1:197101285028:web:3b8f2fc780af8a575b8031"
+    };
 
     let db = null;
     let matchId = null;
     let isScorer = true;
+    let watchRef = null;
+    let endTimer = null;
 
     if (firebaseConfig.databaseURL && typeof firebase !== 'undefined') {
         try {
@@ -349,7 +350,9 @@
         stats: {}, 
         overHist: [], history: [], 
         matchStarted: false,
-        inn1Data: null 
+        inn1Data: null,
+        isSingleBatting: false,
+        matchEnded: false
     };
 
     window.onload = function() {
@@ -447,7 +450,9 @@
             stats: G.stats,
             overHist: [], history: [],
             matchStarted: true,
-            inn1Data: null
+            inn1Data: null,
+            isSingleBatting: false,
+            matchEnded: false
         };
         matchId = "m_" + Date.now();
         saveGameLocal();
@@ -478,16 +483,10 @@
         });
     }
 
-    // ==========================================
-    // CRASH FIX: FIXED SAVE STATE RECURSION
-    // ==========================================
     function saveState() {
         try {
-            // FIX: Remove 'history' from the object before saving it to history
-            // This prevents the object from growing infinitely (Recursion/Memory Leak)
             let stateToSave = { ...G };
             delete stateToSave.history; 
-            
             G.history.push(JSON.stringify(stateToSave));
             if(G.history.length > 20) G.history.shift();
         } catch(e) { console.error("Save Error", e); }
@@ -499,11 +498,12 @@
             let stateStr = G.history.pop();
             let prev = JSON.parse(stateStr);
             
-            // Restore properties individually to preserve current history stack
             G.score = prev.score; G.wkts = prev.wkts; G.balls = prev.balls;
             G.s = prev.s; G.ns = prev.ns; G.b = prev.b;
             G.stats = prev.stats; G.overHist = prev.overHist;
             G.inn = prev.inn; G.target = prev.target; G.inn1Data = prev.inn1Data;
+            G.isSingleBatting = prev.isSingleBatting || false;
+            G.matchEnded = prev.matchEnded || false;
             
             updateUI(); syncOnline(); saveGameLocal();
         } catch(e) { alert("Error undoing"); console.error(e); }
@@ -542,7 +542,10 @@
     }
     function wicket(type) {
         if(type === 'RUNOUT') {
-            openModal("Who Run Out?", [ { txt: G.s, fn:()=>askRoRuns(G.s) }, { txt: G.ns, fn:()=>askRoRuns(G.ns) } ]);
+            openModal("Who Run Out?", [ 
+                { txt: G.s, fn:()=>askRoRuns(G.s) }, 
+                (G.ns ? { txt: G.ns, fn:()=>askRoRuns(G.ns) } : { txt:"Cancel", fn:()=>{ document.getElementById('modal').style.display='none'; } })
+            ]);
         } else {
             saveState();
             G.wkts++; G.balls++;
@@ -558,17 +561,36 @@
                 document.getElementById('modal').style.display='none';
                 saveState();
                 G.score += r; G.balls++;
-                G.stats[G.s].r += r; G.stats[G.s].b++;
+                if(who === G.s || who === G.ns) {
+                    G.stats[G.s].r += r; G.stats[G.s].b++;
+                }
                 G.stats[G.b].br += r; G.stats[G.b].ballsBowled++;
                 G.stats[who].out = true; G.stats[who].howOut = "RUN OUT";
                 G.wkts++; G.overHist.push("W(RO)");
                 if(r%2!==0) swap();
-                if(G.inn===2 && G.score >= G.target) endInnings(); else handleWicket(who);
+                if(G.inn===2 && G.score >= G.target) initiateInningsEnd(); else handleWicket(who);
             }
         })));
     }
     function handleWicket(whoOut) {
-        if(G.wkts >= G.batTeam.p.length - 1) endInnings();
+        if(G.wkts >= G.batTeam.p.length) {
+            initiateInningsEnd();
+        } 
+        else if(G.wkts === G.batTeam.p.length - 1) {
+            openModal("Last Wicket! Allow Single Batting?", [
+                { txt: "✅ Yes (Single Bat)", fn: () => {
+                    document.getElementById('modal').style.display='none';
+                    G.isSingleBatting = true;
+                    G.s = (whoOut === G.s) ? G.ns : G.s;
+                    G.ns = null;
+                    checkGameStatus();
+                }},
+                { txt: "❌ No (End Innings)", fn: () => {
+                    document.getElementById('modal').style.display='none';
+                    initiateInningsEnd();
+                }}
+            ]);
+        }
         else {
             let notOut = (whoOut === G.s) ? G.ns : G.s;
             let avail = G.batTeam.p.filter(p => !G.stats[p].out && p !== notOut);
@@ -578,13 +600,17 @@
             });
         }
     }
-    function swap() { [G.s, G.ns] = [G.ns, G.s]; }
+    
+    function swap() { 
+        if(G.isSingleBatting || !G.s || !G.ns) return; 
+        [G.s, G.ns] = [G.ns, G.s]; 
+    }
     
     function checkGameStatus() {
         try {
-            if(G.inn === 2 && G.score >= G.target) { endInnings(); return; }
+            if(G.inn === 2 && G.score >= G.target) { initiateInningsEnd(); return; }
             if(G.balls > 0 && G.balls % 6 === 0) {
-                if(G.balls >= G.totalOvers * 6) endInnings();
+                if(G.balls >= G.totalOvers * 6) { initiateInningsEnd(); return; }
                 else {
                     swap(); G.overHist.push("|");
                     let avail = G.bowlTeam.p.filter(p => p !== G.b);
@@ -593,6 +619,7 @@
                             G.b = p; updateUI(); syncOnline(); saveGameLocal(); 
                         });
                     }, 100);
+                    return; 
                 }
             }
             updateUI(); syncOnline(); saveGameLocal();
@@ -600,7 +627,54 @@
     }
     function addOver() { if(confirm("Add 1 Over?")) { G.totalOvers++; updateUI(); syncOnline(); saveGameLocal(); } }
 
-    function endInnings() {
+    // ==========================================
+    // 10-SEC COUNTDOWN & UNDO LOGIC
+    // ==========================================
+    function initiateInningsEnd() {
+        updateUI(); 
+        syncOnline(); 
+        saveGameLocal();
+
+        let count = 10;
+        let title = G.inn === 1 ? "Innings Complete" : "Match Finished";
+        
+        document.getElementById('m-title').innerText = title;
+        let b = document.getElementById('m-body');
+        b.innerHTML = `
+            <div style="font-size:1.1rem; margin:15px 0;">Auto-confirm in <b id="end-count" style="color:var(--red); font-size:1.5rem;">${count}</b>s</div>
+            <div style="font-size:0.85rem; color:#666; margin-bottom:15px;">Mistake on last ball? You can undo it now.</div>
+            <div class="modal-grid" style="grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="modal-btn" style="background:#757575; color:white; font-size:1rem;" onclick="cancelEndAndUndo()">⎌ Undo Last</button>
+                <button class="modal-btn" style="background:var(--green); color:white; font-size:1rem;" onclick="forceEndNow()">Confirm Now</button>
+            </div>
+        `;
+        document.getElementById('modal').style.display = 'flex';
+
+        clearInterval(endTimer);
+        endTimer = setInterval(() => {
+            count--;
+            let el = document.getElementById('end-count');
+            if(el) el.innerText = count;
+            if(count <= 0) {
+                clearInterval(endTimer);
+                forceEndNow();
+            }
+        }, 1000);
+    }
+
+    function cancelEndAndUndo() {
+        clearInterval(endTimer);
+        document.getElementById('modal').style.display = 'none';
+        undo();
+    }
+
+    function forceEndNow() {
+        clearInterval(endTimer);
+        document.getElementById('modal').style.display = 'none';
+        finalizeInningsEnd();
+    }
+
+    function finalizeInningsEnd() {
         if(G.inn === 1) {
             alert(`Innings Break! Target: ${G.score + 1}`);
             G.inn1Data = {
@@ -610,19 +684,25 @@
             };
             G.target = G.score + 1; G.inn = 2;
             G.score = 0; G.wkts = 0; G.balls = 0; G.overHist = [];
+            G.isSingleBatting = false; 
             let temp = G.batTeam; G.batTeam = G.bowlTeam; G.bowlTeam = temp;
             startInnings();
         } else {
-            let res = (G.score >= G.target) ? `${G.batTeam.name} Won!` : `${G.bowlTeam.name} Won!`;
-            alert("Match Finished! " + res);
+            let res = "";
+            if (G.score > G.target - 1) res = `${G.batTeam.name} Won!`;
+            else if (G.score === G.target - 1) res = "Match Tied!";
+            else res = `${G.bowlTeam.name} Won!`;
+            
             saveMatchToHistory(res);
             if(db && isScorer && matchId) {
                 try { db.ref('active_matches/'+matchId).remove(); } catch(e){}
             }
             clearActiveMatch();
-            location.reload();
+            G.matchEnded = true;
+            generateAndShowCard();
         }
     }
+
     function exitMatch() {
         if(confirm("Stop match & Save to History?")) {
             saveMatchToHistory("Abandoned");
@@ -733,8 +813,22 @@
             document.getElementById('msg-need').style.display = 'none';
         }
 
-        if(G.s) { let s=G.stats[G.s]; document.getElementById('name-s').innerText="🏏 "+G.s; document.getElementById('stat-s').innerText=`${s.r}(${s.b})`; }
-        if(G.ns) { let ns=G.stats[G.ns]; document.getElementById('name-ns').innerText=G.ns; document.getElementById('stat-ns').innerText=`${ns.r}(${ns.b})`; }
+        if(G.s) { 
+            let s=G.stats[G.s]; 
+            document.getElementById('name-s').innerText="🏏 "+G.s; 
+            document.getElementById('stat-s').innerText=`${s.r}(${s.b})`; 
+            document.getElementById('box-s').style.display = 'flex'; 
+        } else { document.getElementById('box-s').style.display = 'none'; }
+        
+        if(G.ns && !G.isSingleBatting) { 
+            let ns=G.stats[G.ns]; 
+            document.getElementById('name-ns').innerText=G.ns; 
+            document.getElementById('stat-ns').innerText=`${ns.r}(${ns.b})`; 
+            document.getElementById('box-ns').style.display = 'flex'; 
+        } else { 
+            document.getElementById('box-ns').style.display = 'none'; 
+        }
+        
         if(G.b) { let b=G.stats[G.b]; document.getElementById('name-b').innerText=G.b; document.getElementById('stat-b').innerText=`${b.bw}-${b.br} (${Math.floor(b.ballsBowled/6)}.${b.ballsBowled%6})`; }
         
         if(G.overHist) {
@@ -767,7 +861,15 @@
 
     // --- SCORECARD ---
     function generateAndShowCard() {
-        let html = `<div class="sc-header">MATCH SUMMARY</div>`;
+        if(!G.matchEnded) {
+            document.getElementById('sc-close-btn').style.display = 'inline-block';
+            document.getElementById('sc-home-btn').style.display = 'none';
+        } else {
+            document.getElementById('sc-close-btn').style.display = 'none';
+            document.getElementById('sc-home-btn').style.display = 'inline-block';
+        }
+
+        let html = `<div class="sc-header" style="background:var(--primary); color:white; padding:10px; text-align:center; font-weight:bold;">MATCH SUMMARY</div>`;
         let d1 = (G.inn === 2 && G.inn1Data) ? G.inn1Data : (G.inn===1 ? G : null);
         if(d1) html += generateInningHTML("1st INNINGS", d1.batTeam, d1.bowlTeam, d1.score, d1.wkts, d1.balls, d1.stats);
         if(G.inn === 2) html += generateInningHTML("2nd INNINGS", G.batTeam, G.bowlTeam, G.score, G.wkts, G.balls, G.stats);
@@ -792,11 +894,23 @@
                 bowlRows += `<tr><td>${name}</td><td class="nums">${ov}</td><td class="nums">${s.br}</td><td class="nums">${s.bw}</td><td class="nums">${eco}</td></tr>`;
             }
         });
-        return `<div class="sc-inning-box"><div class="sc-inning-title"><span>${batT.name}</span><span>${sc}/${wk} (${Math.floor(bl/6)}.${bl%6})</span></div><table class="sc-table"><tr><th>Batter</th><th class="nums">R</th><th class="nums">B</th><th class="nums">4s</th><th class="nums">6s</th><th class="nums">SR</th></tr>${batRows}</table><div style="background:#f9f9f9; padding:5px; font-weight:bold; font-size:0.75rem; color:#555; border-top:1px solid #ddd; margin-top:5px">BOWLING</div><table class="sc-table"><tr><th>Bowler</th><th class="nums">O</th><th class="nums">R</th><th class="nums">W</th><th class="nums">Eco</th></tr>${bowlRows}</table></div>`;
+        return `
+        <div class="sc-inning-box" style="margin-top:10px; border:1px solid #ddd; border-radius:5px;">
+            <div style="background:var(--primary); color:white; padding:8px; text-align:center; font-weight:bold; font-size:1.1rem; letter-spacing:1px; border-top-left-radius:5px; border-top-right-radius:5px;">
+                ${title}
+            </div>
+            <div class="sc-inning-title">
+                <span>${batT.name}</span>
+                <span>${sc}/${wk} (${Math.floor(bl/6)}.${bl%6} Ov)</span>
+            </div>
+            <table class="sc-table"><tr><th>Batter</th><th class="nums">R</th><th class="nums">B</th><th class="nums">4s</th><th class="nums">6s</th><th class="nums">SR</th></tr>${batRows}</table>
+            <div style="background:#f9f9f9; padding:5px; font-weight:bold; font-size:0.75rem; color:#555; border-top:1px solid #ddd; margin-top:5px">BOWLING</div>
+            <table class="sc-table"><tr><th>Bowler</th><th class="nums">O</th><th class="nums">R</th><th class="nums">W</th><th class="nums">Eco</th></tr>${bowlRows}</table>
+        </div>`;
     }
     function downloadScorecard() {
         const el = document.getElementById('sc-card-content');
-        html2canvas(el, { scale: 2, useCORS: true }).then(canvas => {
+        html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
             let link = document.createElement('a');
             link.download = `scorecard_${Date.now()}.png`;
             link.href = canvas.toDataURL();
@@ -815,13 +929,22 @@
             let data = snap.val();
             c.innerHTML = "";
             if(!data) { c.innerHTML = "<div style='text-align:center; padding:20px;'>No active matches.</div>"; return; }
+            
+            let now = Date.now();
             Object.keys(data).forEach(k => {
                 let m = data[k];
-                let div = document.createElement('div'); div.className = "match-list-item";
-                div.innerHTML = `<div class="m-title">${m.name}</div><div class="m-sub">Started recently</div>`;
-                div.onclick = () => watchMatch(k);
-                c.appendChild(div);
+                // Auto delete 30 mins (1800000 ms) idle matches
+                if (!m.timestamp || (now - m.timestamp > 1800000)) {
+                    db.ref('active_matches/'+k).remove();
+                    db.ref('matches/'+k).remove();
+                } else {
+                    let div = document.createElement('div'); div.className = "match-list-item";
+                    div.innerHTML = `<div class="m-title">${m.name}</div><div class="m-sub">Started recently</div>`;
+                    div.onclick = () => watchMatch(k);
+                    c.appendChild(div);
+                }
             });
+            if(c.innerHTML === "") c.innerHTML = "<div style='text-align:center; padding:20px;'>No active matches.</div>";
         });
     }
     function watchMatch(mid) {
@@ -832,14 +955,24 @@
         document.getElementById('btn-add-ov').style.display='none';
         document.getElementById('btn-exit').style.display='none';
         document.getElementById('watch-msg').style.display='block';
-        db.ref('matches/' + mid).on('value', snap => { let val = snap.val(); if(val) { G = val; updateUI(); } });
+        watchRef = db.ref('matches/' + mid);
+        watchRef.on('value', snap => { 
+            let val = snap.val(); 
+            if(val) { G = val; updateUI(); } 
+            else { alert("Match Ended/Deleted."); exitWatchMode(); } 
+        });
+    }
+    function exitWatchMode() {
+        if(watchRef) watchRef.off();
+        document.getElementById('game-ui').style.display='none';
+        document.getElementById('watch-msg').style.display='none';
+        document.getElementById('home-screen').style.display='flex';
     }
 
     // Persistence with Crash Protection
     function saveGameLocal() { 
         if(isScorer && G.matchStarted) { 
             try {
-                // IMPORTANT: Don't save recursive history to LocalStorage either
                 let stateToSave = { ...G };
                 delete stateToSave.history;
                 localStorage.setItem('gully_active', JSON.stringify(stateToSave)); 
@@ -853,7 +986,6 @@
     function resumeMatch() { 
         try {
             G = JSON.parse(localStorage.getItem('gully_active')); 
-            // Re-initialize history as empty array on resume to prevent old history from crashing
             G.history = [];
             matchId = localStorage.getItem('gully_mid'); 
             document.getElementById('home-screen').style.display='none'; 
@@ -872,8 +1004,10 @@
         if(db && matchId && isScorer) {
             try { 
                 let stateToSync = { ...G };
-                delete stateToSync.history; // Don't sync history to Firebase
+                delete stateToSync.history;
                 db.ref('matches/'+matchId).set(stateToSync); 
+                // Update timestamp for 30min timeout logic
+                db.ref('active_matches/'+matchId).update({ timestamp: Date.now() });
             } catch(e){}
         }
     }
