@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Gully Cricket Pro - TV Style</title>
+    <meta name="theme-color" content="#1a237e">
+    
+    <link rel="icon" type="image/png" href="Logoap.png">
+    <link rel="apple-touch-icon" href="Logoap.png">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gully Cricket">
+
+    <title>Gully Cricket Pro (Stable)</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -13,21 +22,21 @@
         :root { 
             --primary: #1a237e; --accent: #ffab00; --bg-gray: #f4f6f8; --green: #2e7d32; --red: #d32f2f;
         }
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; padding: 0; background: #000; height: 100dvh; 
+            display: flex; justify-content: center; 
+            overscroll-behavior-y: contain; 
+        }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: #000; height: 100dvh; display: flex; justify-content: center; }
         
-        /* --- MAIN APP CONTAINER --- */
         .app-container { width: 100%; max-width: 500px; background: var(--bg-gray); height: 100%; display: flex; flex-direction: column; position: relative; }
 
-        /* --- HEADER --- */
         .tv-header {
             flex: 0 0 auto;
             background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
-            color: white;
-            padding: 15px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 10;
-            position: relative;
+            color: white; padding: 15px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10;
         }
         .match-info { display: flex; justify-content: space-between; font-size: 0.85rem; opacity: 0.95; margin-bottom: 8px; font-weight: 500; }
         .score-row { display: flex; justify-content: space-between; align-items: center; }
@@ -42,7 +51,6 @@
             display: none; 
         }
 
-        /* --- LIVE BAR --- */
         .live-bar {
             flex: 0 0 auto; background: white; border-bottom: 1px solid #ddd;
             display: grid; grid-template-columns: 1.2fr 1.2fr 0.8fr;
@@ -55,7 +63,6 @@
         .active-bat .p-name { color: var(--primary); }
         .bowler-box { text-align: right; border-left: 1px solid #eee; padding-left: 8px; }
 
-        /* --- SCROLL AREA --- */
         .scroll-area {
             flex: 1 1 auto; overflow-y: auto; padding: 10px;
             display: flex; flex-direction: column; align-items: center; gap: 10px;
@@ -76,7 +83,6 @@
             box-shadow: 0 3px 5px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; gap:8px;
         }
 
-        /* --- CONTROLS --- */
         .controls {
             flex: 0 0 auto; background: white; padding: 10px 10px calc(15px + env(safe-area-inset-bottom)) 10px;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; z-index: 20;
@@ -84,7 +90,7 @@
         .key {
             height: 50px; border: 1px solid #cfd8dc; background: white; border-radius: 8px;
             font-size: 1.3rem; font-weight: 800; color: #333; cursor: pointer; position: relative;
-            box-shadow: 0 3px 0 #b0bec5;
+            box-shadow: 0 3px 0 #b0bec5; touch-action: manipulation;
         }
         .key:active { transform: translateY(3px); box-shadow: none; }
         .k-4 { background: #e1f5fe; color: #01579b; border-color: #b3e5fc; box-shadow: 0 3px 0 #81d4fa; }
@@ -92,8 +98,7 @@
         .k-w { background: var(--red); color: white; font-size: 1rem; border:none; box-shadow: 0 3px 0 #8e0000; }
         .k-undo { background: #757575; color: white; font-size: 1.5rem; border:none; box-shadow: 0 3px 0 #424242; }
 
-        /* --- SETUP UI --- */
-        .setup-screen, .match-list-screen { position: absolute; inset: 0; background: #fff; z-index: 50; display: flex; flex-direction: column; overflow: hidden; }
+        .setup-screen, .match-list-screen, .history-screen { position: absolute; inset: 0; background: #fff; z-index: 50; display: flex; flex-direction: column; overflow: hidden; }
         .setup-top { padding: 15px; background: var(--primary); color: white; text-align: center; }
         .team-names-row { display: flex; gap: 10px; margin-top: 10px; }
         .inp-tm { width: 50%; padding: 8px; border-radius: 4px; border: none; text-align: center; font-weight: bold; }
@@ -108,26 +113,23 @@
         .setup-footer { padding: 15px; background: white; border-top: 1px solid #eee; text-align: center; display: flex; gap: 10px; flex-direction: column; }
         .overs-input { width: 100%; padding: 10px; border: 2px solid var(--primary); border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.1rem; }
 
-        /* --- FULL SCORECARD MODAL (TV STYLE) --- */
         .full-sc-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; overflow-y: auto; padding: 10px; }
         .sc-card-container { background: white; max-width: 600px; margin: 0 auto; border-radius: 5px; overflow: hidden; }
         .sc-header { background: var(--primary); color: white; padding: 10px; text-align: center; font-weight: bold; }
         .sc-inning-box { margin-bottom: 10px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
         .sc-inning-title { background: #eee; padding: 5px 10px; font-weight: bold; font-size: 0.9rem; color: #333; display: flex; justify-content: space-between; }
-        
         .sc-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         .sc-table th { background: #f5f5f5; text-align: left; padding: 6px; color: #666; font-size: 0.75rem; border-bottom: 1px solid #ddd; }
         .sc-table td { padding: 6px; border-bottom: 1px solid #eee; color: #333; }
         .sc-table .nums { text-align: right; font-weight: 600; }
         .sc-batter-name { font-weight: bold; color: var(--primary); }
         .sc-out-desc { font-size: 0.7rem; color: #888; display: block; }
-        .sc-total-row { background: #e3f2fd; font-weight: bold; }
 
-        /* --- HOME & LIST --- */
         .home-screen { position: absolute; inset: 0; background: var(--bg-gray); z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .home-logo-container { margin-bottom: 15px; }
+        .home-logo-img { width: 100px; height: 100px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); object-fit: cover; }
         .home-btn { width: 100%; max-width: 280px; padding: 15px; margin: 8px 0; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 10px; }
         
-        /* Modal Helpers */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 100; }
         .modal-box { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 10px; text-align: center; }
         .modal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
@@ -135,20 +137,48 @@
         .list-opt { padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; cursor: pointer; }
         .btn-add-over { font-size: 10px; background: var(--accent); color: var(--primary); border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-weight: bold; vertical-align: middle; margin-left: 5px; }
 
-        /* Match List Styles */
         .match-list-item { background: white; padding: 15px; margin: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; border-left: 5px solid var(--green); }
         .m-title { font-weight: bold; font-size: 1.1rem; color: #333; }
         .m-sub { font-size: 0.85rem; color: #777; margin-top: 3px; }
+
+        .stat-card { background: #333; color: white; padding: 15px; margin: 10px; border-radius: 8px; }
+        .stat-table { width: 100%; font-size: 0.85rem; text-align: center; }
+        .stat-table th { color: #aaa; font-weight: normal; padding-bottom: 5px; border-bottom: 1px solid #555; }
+        .stat-table td { padding: 8px 0; border-bottom: 1px solid #444; }
+        .hist-date-hdr { text-align: center; padding: 10px; font-weight: bold; color: #666; background: #f0f0f0; }
     </style>
 </head>
 <body>
 
     <div id="home-screen" class="home-screen">
-        <div style="font-size:3rem; margin-bottom:10px">🏏</div>
+        <div class="home-logo-container">
+            <img src="Logoap.png" class="home-logo-img" alt="App Logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22red%22/></svg>'">
+        </div>
         <h1 style="color:var(--primary); margin-top:0">Gully Cricket Pro</h1>
         <button id="btn-resume" class="home-btn" style="background:var(--green); color:white; display:none" onclick="resumeMatch()">▶ Resume Match</button>
         <button class="home-btn" style="background:var(--accent); color:var(--primary)" onclick="startSetup()">Start New Match</button>
         <button class="home-btn" style="background:white; color:#333" onclick="openMatchList()">🔴 Watch Live (No ID)</button>
+        <button class="home-btn" style="background:white; color:#333" onclick="showHistory()">📜 Today's History & Stats</button>
+    </div>
+
+    <div id="history-screen" class="history-screen" style="display:none; background:#f4f6f8">
+        <div class="tv-header">
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <span>📅 Today's Stats & History</span>
+                <button onclick="document.getElementById('history-screen').style.display='none'; document.getElementById('home-screen').style.display='flex'" style="background:none; border:none; color:white; font-size:1.2rem">✖</button>
+            </div>
+        </div>
+        <div style="flex:1; overflow-y:auto">
+            <div class="stat-card">
+                <h4 style="margin:0 0 10px 0; color:var(--accent)">🏆 Today's Top Performers</h4>
+                <div id="daily-stats-body">No matches played today.</div>
+            </div>
+            <div class="hist-date-hdr">COMPLETED MATCHES (TODAY)</div>
+            <div id="history-list-container"></div>
+            <div style="padding:20px; text-align:center">
+                <button onclick="clearHistory()" style="background:#d32f2f; color:white; padding:10px 20px; border:none; border-radius:5px">🗑 Clear Today's History</button>
+            </div>
+        </div>
     </div>
 
     <div id="match-list-screen" class="match-list-screen" style="display:none; background:#f4f6f8">
@@ -158,9 +188,7 @@
                 <button onclick="document.getElementById('match-list-screen').style.display='none'; document.getElementById('home-screen').style.display='flex'" style="background:none; border:none; color:white; font-size:1.2rem">✖</button>
             </div>
         </div>
-        <div id="live-list-container" style="padding:10px; overflow-y:auto">
-            <div style="text-align:center; padding:20px; color:#888">Loading active matches...</div>
-        </div>
+        <div id="live-list-container" style="padding:10px; overflow-y:auto"></div>
     </div>
 
     <div id="setup-screen" class="setup-screen" style="display:none">
@@ -262,11 +290,8 @@
         <div style="text-align:right; max-width:600px; margin:0 auto; padding:5px">
             <button onclick="document.getElementById('full-sc-overlay').style.display='none'" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px">Close ✖</button>
         </div>
-        
-        <div id="sc-card-content" class="sc-card-container">
-            </div>
-
-        <div style="text-align:center; margin-top:15px; max-width:600px; margin-left:auto; margin-right:auto;">
+        <div id="sc-card-content" class="sc-card-container"></div>
+        <div style="text-align:center; margin-top:15px;">
             <button onclick="downloadScorecard()" style="background:#0084ff; color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; font-size:1.1rem; box-shadow:0 4px 10px rgba(0,0,0,0.3)">
                 📥 Download / Share
             </button>
@@ -283,22 +308,29 @@
 
 <script>
     // ==========================================
-    // CONFIG: REPLACE WITH YOUR FIREBASE INFO
+    // CRASH FIX: GLOBAL ERROR HANDLER
     // ==========================================
-    const firebaseConfig = {  apiKey: "AIzaSyA4iMak_E4OwmR9UkeITElkT3ZBk8tLO_o",
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error("Caught Crash:", message);
+        return true; 
+    };
+
+    const firebaseConfig = {apiKey: "AIzaSyA4iMak_E4OwmR9UkeITElkT3ZBk8tLO_o",
   authDomain: "cricketscore-715fe.firebaseapp.com",
   databaseURL: "https://cricketscore-715fe-default-rtdb.firebaseio.com",
   projectId: "cricketscore-715fe",
   storageBucket: "cricketscore-715fe.firebasestorage.app",
   messagingSenderId: "197101285028",
   appId: "1:197101285028:web:3b8f2fc780af8a575b8031"
-    };
+};
+        // apiKey: "YOUR_API_KEY",
+        // databaseURL: "https://YOUR_ID.firebaseio.com",
+
 
     let db = null;
     let matchId = null;
     let isScorer = true;
 
-    // Check Firebase
     if (firebaseConfig.databaseURL && typeof firebase !== 'undefined') {
         try {
             firebase.initializeApp(firebaseConfig);
@@ -306,9 +338,6 @@
         } catch(e) { console.error("Firebase Init Error", e); }
     }
 
-    // ==========================================
-    // GLOBAL STATE
-    // ==========================================
     let pool = [], ta = [], tb = [];
     
     let G = {
@@ -317,39 +346,40 @@
         score: 0, wkts: 0, balls: 0,
         totalOvers: 5,
         s: null, ns: null, b: null,
-        stats: {}, // { name: { r, b, 4, 6, out, bw, br, ballsBowled } }
-        overHist: [], 
-        history: [], 
+        stats: {}, 
+        overHist: [], history: [], 
         matchStarted: false,
-        
-        // Storing 1st Innings Data for Scorecard
         inn1Data: null 
     };
 
-    // ==========================================
-    // INITIALIZATION
-    // ==========================================
     window.onload = function() {
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
         loadTeamsLocal();
         checkActiveMatch();
     };
 
-    // --- SETUP LOGIC ---
     function saveTeamsLocal() {
-        let nA = document.getElementById('ta-name').value;
-        let nB = document.getElementById('tb-name').value;
-        localStorage.setItem('gully_teams', JSON.stringify({
-            taName: nA, tbName: nB, pool: pool, ta: ta, tb: tb
-        }));
+        try {
+            let nA = document.getElementById('ta-name').value;
+            let nB = document.getElementById('tb-name').value;
+            localStorage.setItem('gully_teams', JSON.stringify({
+                taName: nA, tbName: nB, pool: pool, ta: ta, tb: tb
+            }));
+        } catch(e){}
     }
     function loadTeamsLocal() {
-        let data = localStorage.getItem('gully_teams');
-        if(data) {
-            let p = JSON.parse(data);
-            pool = p.pool || []; ta = p.ta || []; tb = p.tb || [];
-            document.getElementById('ta-name').value = p.taName || "Team A";
-            document.getElementById('tb-name').value = p.tbName || "Team B";
-        }
+        try {
+            let data = localStorage.getItem('gully_teams');
+            if(data) {
+                let p = JSON.parse(data);
+                pool = p.pool || []; ta = p.ta || []; tb = p.tb || [];
+                document.getElementById('ta-name').value = p.taName || "Team A";
+                document.getElementById('tb-name').value = p.tbName || "Team B";
+            }
+        } catch(e){}
         renderSetup();
     }
     function startSetup() {
@@ -384,14 +414,13 @@
         if(confirm("Clear all?")) { pool=[]; ta=[]; tb=[]; renderSetup(); saveTeamsLocal(); }
     }
 
-    // --- GAME START ---
+    // --- GAME LOGIC ---
     function proceedToToss() {
         if(ta.length<2 || tb.length<2) return alert("Min 2 players/team");
         let nA = document.getElementById('ta-name').value;
         let nB = document.getElementById('tb-name').value;
         let ov = parseInt(document.getElementById('inp-overs').value)||5;
         
-        // Reset stats
         G.stats = {};
         [...ta, ...tb].forEach(p => G.stats[p] = { r:0, b:0, 4:0, 6:0, out:false, howOut:"", bw:0, br:0, ballsBowled:0 });
 
@@ -420,15 +449,13 @@
             matchStarted: true,
             inn1Data: null
         };
-        matchId = "m_" + Date.now(); // Simple ID
+        matchId = "m_" + Date.now();
         saveGameLocal();
         
-        // PUBLISH TO "ACTIVE MATCHES" LIST
         if(db) {
-            db.ref('active_matches/' + matchId).set({
-                name: `${batN} vs ${bowlN}`,
-                timestamp: Date.now()
-            });
+            try {
+                db.ref('active_matches/' + matchId).set({ name: `${batN} vs ${bowlN}`, timestamp: Date.now() });
+            } catch(e) { console.log("Offline mode"); }
         }
 
         document.getElementById('modal').style.display = 'none';
@@ -452,55 +479,57 @@
     }
 
     // ==========================================
-    // SCORING LOGIC
+    // CRASH FIX: FIXED SAVE STATE RECURSION
     // ==========================================
     function saveState() {
-        let copy = JSON.parse(JSON.stringify(G)); // Deep copy
-        G.history.push(JSON.stringify(copy));
-        if(G.history.length > 20) G.history.shift();
+        try {
+            // FIX: Remove 'history' from the object before saving it to history
+            // This prevents the object from growing infinitely (Recursion/Memory Leak)
+            let stateToSave = { ...G };
+            delete stateToSave.history; 
+            
+            G.history.push(JSON.stringify(stateToSave));
+            if(G.history.length > 20) G.history.shift();
+        } catch(e) { console.error("Save Error", e); }
     }
+
     function undo() {
         if(G.history.length === 0) return alert("Cannot Undo");
-        let prev = JSON.parse(G.history.pop());
-        // Restore essential fields
-        G.score = prev.score; G.wkts = prev.wkts; G.balls = prev.balls;
-        G.s = prev.s; G.ns = prev.ns; G.b = prev.b;
-        G.stats = prev.stats; G.overHist = prev.overHist;
-        G.inn = prev.inn; G.target = prev.target; G.inn1Data = prev.inn1Data;
-        
-        updateUI(); syncOnline(); saveGameLocal();
+        try {
+            let stateStr = G.history.pop();
+            let prev = JSON.parse(stateStr);
+            
+            // Restore properties individually to preserve current history stack
+            G.score = prev.score; G.wkts = prev.wkts; G.balls = prev.balls;
+            G.s = prev.s; G.ns = prev.ns; G.b = prev.b;
+            G.stats = prev.stats; G.overHist = prev.overHist;
+            G.inn = prev.inn; G.target = prev.target; G.inn1Data = prev.inn1Data;
+            
+            updateUI(); syncOnline(); saveGameLocal();
+        } catch(e) { alert("Error undoing"); console.error(e); }
     }
 
     function run(r) {
         saveState();
         G.score += r; G.balls++;
-        
         let s = G.stats[G.s]; s.r+=r; s.b++;
         if(r===4) s[4]++; if(r===6) s[6]++;
-        
         let b = G.stats[G.b]; b.br+=r; b.ballsBowled++;
-        
         G.overHist.push(r);
         if(r%2!==0) swap();
         checkGameStatus();
     }
-
     function extra(type) {
         saveState();
-        G.score++;
-        G.stats[G.b].br++;
-        G.overHist.push(type);
+        G.score++; G.stats[G.b].br++; G.overHist.push(type);
         checkGameStatus();
     }
-
-    // --- NO BALL MODAL (NO INPUT BOX) ---
     function askNoBall() {
         openModal("No Ball: Runs off bat?", [0,1,2,3,4,6].map(r => ({
             txt: "+" + r, fn: () => {
                 document.getElementById('modal').style.display = 'none';
                 saveState();
-                G.score += (1+r);
-                G.stats[G.b].br += (1+r);
+                G.score += (1+r); G.stats[G.b].br += (1+r);
                 if(r>0) {
                     let s = G.stats[G.s]; s.r+=r; s.b++;
                     if(r===4) s[4]++; if(r===6) s[6]++;
@@ -511,14 +540,9 @@
             }
         })));
     }
-
-    // --- WICKET LOGIC ---
     function wicket(type) {
         if(type === 'RUNOUT') {
-            openModal("Who Run Out?", [
-                { txt: G.s, fn:()=>askRoRuns(G.s) },
-                { txt: G.ns, fn:()=>askRoRuns(G.ns) }
-            ]);
+            openModal("Who Run Out?", [ { txt: G.s, fn:()=>askRoRuns(G.s) }, { txt: G.ns, fn:()=>askRoRuns(G.ns) } ]);
         } else {
             saveState();
             G.wkts++; G.balls++;
@@ -528,7 +552,6 @@
             handleWicket(G.s);
         }
     }
-
     function askRoRuns(who) {
         openModal("Runs completed?", [0,1,2,3].map(r => ({
             txt: r + " Runs", fn: () => {
@@ -538,21 +561,15 @@
                 G.stats[G.s].r += r; G.stats[G.s].b++;
                 G.stats[G.b].br += r; G.stats[G.b].ballsBowled++;
                 G.stats[who].out = true; G.stats[who].howOut = "RUN OUT";
-                G.wkts++;
-                G.overHist.push("W(RO)");
+                G.wkts++; G.overHist.push("W(RO)");
                 if(r%2!==0) swap();
-                
-                // Check win if 2nd inning
-                if(G.inn===2 && G.score >= G.target) endInnings();
-                else handleWicket(who);
+                if(G.inn===2 && G.score >= G.target) endInnings(); else handleWicket(who);
             }
         })));
     }
-
     function handleWicket(whoOut) {
-        if(G.wkts >= G.batTeam.p.length - 1) {
-            endInnings();
-        } else {
+        if(G.wkts >= G.batTeam.p.length - 1) endInnings();
+        else {
             let notOut = (whoOut === G.s) ? G.ns : G.s;
             let avail = G.batTeam.p.filter(p => !G.stats[p].out && p !== notOut);
             selectPlayer("New Batsman", avail, (p) => {
@@ -561,68 +578,141 @@
             });
         }
     }
-
     function swap() { [G.s, G.ns] = [G.ns, G.s]; }
-
+    
     function checkGameStatus() {
-        if(G.inn === 2 && G.score >= G.target) { endInnings(); return; }
-        
-        if(G.balls > 0 && G.balls % 6 === 0) {
-            if(G.balls >= G.totalOvers * 6) {
-                endInnings();
-            } else {
-                swap();
-                G.overHist.push("|");
-                let avail = G.bowlTeam.p.filter(p => p !== G.b);
-                setTimeout(() => {
-                    selectPlayer("Next Bowler", avail, (p) => {
-                        G.b = p;
-                        updateUI(); syncOnline(); saveGameLocal();
-                    });
-                }, 100);
+        try {
+            if(G.inn === 2 && G.score >= G.target) { endInnings(); return; }
+            if(G.balls > 0 && G.balls % 6 === 0) {
+                if(G.balls >= G.totalOvers * 6) endInnings();
+                else {
+                    swap(); G.overHist.push("|");
+                    let avail = G.bowlTeam.p.filter(p => p !== G.b);
+                    setTimeout(() => {
+                        selectPlayer("Next Bowler", avail, (p) => { 
+                            G.b = p; updateUI(); syncOnline(); saveGameLocal(); 
+                        });
+                    }, 100);
+                }
             }
-        }
-        updateUI(); syncOnline(); saveGameLocal();
+            updateUI(); syncOnline(); saveGameLocal();
+        } catch(e) { console.error("Game Loop Error", e); }
     }
-
-    function addOver() {
-        if(confirm("Add 1 Over?")) { G.totalOvers++; updateUI(); syncOnline(); saveGameLocal(); }
-    }
+    function addOver() { if(confirm("Add 1 Over?")) { G.totalOvers++; updateUI(); syncOnline(); saveGameLocal(); } }
 
     function endInnings() {
         if(G.inn === 1) {
             alert(`Innings Break! Target: ${G.score + 1}`);
-            // Store 1st inning data for scorecard
             G.inn1Data = {
                 batTeam: G.batTeam, bowlTeam: G.bowlTeam,
                 score: G.score, wkts: G.wkts, balls: G.balls,
-                stats: JSON.parse(JSON.stringify(G.stats)) // Snapshot
+                stats: JSON.parse(JSON.stringify(G.stats))
             };
-
-            G.target = G.score + 1;
-            G.inn = 2;
+            G.target = G.score + 1; G.inn = 2;
             G.score = 0; G.wkts = 0; G.balls = 0; G.overHist = [];
-            
-            // Swap Teams
             let temp = G.batTeam; G.batTeam = G.bowlTeam; G.bowlTeam = temp;
-            
             startInnings();
         } else {
             let res = (G.score >= G.target) ? `${G.batTeam.name} Won!` : `${G.bowlTeam.name} Won!`;
             alert("Match Finished! " + res);
-            // Remove from active list
-            if(db && isScorer) db.ref('active_matches/'+matchId).remove();
+            saveMatchToHistory(res);
+            if(db && isScorer && matchId) {
+                try { db.ref('active_matches/'+matchId).remove(); } catch(e){}
+            }
+            clearActiveMatch();
+            location.reload();
+        }
+    }
+    function exitMatch() {
+        if(confirm("Stop match & Save to History?")) {
+            saveMatchToHistory("Abandoned");
             clearActiveMatch();
             location.reload();
         }
     }
 
     // ==========================================
-    // UI & HELPERS
+    // HISTORY & STATS LOGIC
+    // ==========================================
+    function saveMatchToHistory(res) {
+        try {
+            let h = JSON.parse(localStorage.getItem('gully_history') || "[]");
+            let rec = {
+                id: matchId,
+                date: new Date().toLocaleDateString('en-CA'),
+                res: res,
+                desc: `${G.batTeam.name} vs ${G.bowlTeam.name}`,
+                inn1: G.inn1Data,
+                inn2: { score:G.score, wkts:G.wkts, balls:G.balls, stats:G.stats }
+            };
+            h.unshift(rec);
+            localStorage.setItem('gully_history', JSON.stringify(h));
+        } catch(e) {}
+    }
+
+    function showHistory() {
+        document.getElementById('home-screen').style.display = 'none';
+        document.getElementById('history-screen').style.display = 'flex';
+        
+        let h = JSON.parse(localStorage.getItem('gully_history') || "[]");
+        let todayStr = new Date().toLocaleDateString('en-CA');
+        
+        let todayMatches = h.filter(m => m.date === todayStr);
+
+        let listDiv = document.getElementById('history-list-container');
+        if(todayMatches.length === 0) {
+            listDiv.innerHTML = "<div style='text-align:center; padding:20px; color:#999'>No completed matches today.</div>";
+            document.getElementById('daily-stats-body').innerHTML = "Play matches to see stats.";
+        } else {
+            listDiv.innerHTML = todayMatches.map(m => `
+                <div class="match-list-item" style="border-left-color:var(--primary)">
+                    <div class="m-title">${m.res}</div>
+                    <div class="m-sub">${m.desc}</div>
+                </div>
+            `).join('');
+
+            let playerStats = {};
+            todayMatches.forEach(m => {
+                let allStats = [];
+                if(m.inn1 && m.inn1.stats) allStats.push(m.inn1.stats);
+                if(m.inn2 && m.inn2.stats) allStats.push(m.inn2.stats);
+
+                allStats.forEach(statObj => {
+                    for(let pName in statObj) {
+                        if(!playerStats[pName]) playerStats[pName] = { r:0, w:0 };
+                        playerStats[pName].r += statObj[pName].r || 0;
+                        playerStats[pName].w += statObj[pName].bw || 0;
+                    }
+                });
+            });
+
+            let sortedPlayers = Object.keys(playerStats).sort((a,b) => playerStats[b].r - playerStats[a].r);
+            
+            let tbl = `
+                <table class="stat-table">
+                    <tr><th>Player</th><th>Runs</th><th>Wkts</th></tr>
+                    ${sortedPlayers.map(p => `<tr><td>${p}</td><td><b>${playerStats[p].r}</b></td><td>${playerStats[p].w}</td></tr>`).join('')}
+                </table>
+            `;
+            document.getElementById('daily-stats-body').innerHTML = tbl;
+        }
+    }
+
+    function clearHistory() {
+        if(confirm("Delete Today's History?")) {
+            let h = JSON.parse(localStorage.getItem('gully_history') || "[]");
+            let todayStr = new Date().toLocaleDateString('en-CA');
+            let kept = h.filter(m => m.date !== todayStr);
+            localStorage.setItem('gully_history', JSON.stringify(kept));
+            showHistory();
+        }
+    }
+
+    // ==========================================
+    // UI HELPER
     // ==========================================
     function updateUI() {
         if(!G.matchStarted) return;
-        
         document.getElementById('ui-inn').innerText = G.inn===1 ? "1st Innings" : `Target: ${G.target}`;
         document.getElementById('ui-team').innerText = G.batTeam.name;
         document.getElementById('sc-runs').innerText = G.score;
@@ -630,7 +720,6 @@
         document.getElementById('sc-overs').innerText = `${Math.floor(G.balls/6)}.${G.balls%6}`;
         document.getElementById('sc-total-overs').innerText = G.totalOvers;
         
-        // CRR & RRR
         let crr = G.balls ? (G.score*6/G.balls).toFixed(2) : "0.0";
         document.getElementById('ui-crr-hdr').innerText = "CRR: "+crr;
         
@@ -644,141 +733,67 @@
             document.getElementById('msg-need').style.display = 'none';
         }
 
-        if(G.s) {
-            let s = G.stats[G.s];
-            document.getElementById('name-s').innerText = "🏏 "+G.s;
-            document.getElementById('stat-s').innerText = `${s.r}(${s.b})`;
-        }
-        if(G.ns) {
-            let ns = G.stats[G.ns];
-            document.getElementById('name-ns').innerText = G.ns;
-            document.getElementById('stat-ns').innerText = `${ns.r}(${ns.b})`;
-        }
-        if(G.b) {
-            let b = G.stats[G.b];
-            document.getElementById('name-b').innerText = G.b;
-            document.getElementById('stat-b').innerText = `${b.bw}-${b.br} (${Math.floor(b.ballsBowled/6)}.${b.ballsBowled%6})`;
-        }
+        if(G.s) { let s=G.stats[G.s]; document.getElementById('name-s').innerText="🏏 "+G.s; document.getElementById('stat-s').innerText=`${s.r}(${s.b})`; }
+        if(G.ns) { let ns=G.stats[G.ns]; document.getElementById('name-ns').innerText=G.ns; document.getElementById('stat-ns').innerText=`${ns.r}(${ns.b})`; }
+        if(G.b) { let b=G.stats[G.b]; document.getElementById('name-b').innerText=G.b; document.getElementById('stat-b').innerText=`${b.bw}-${b.br} (${Math.floor(b.ballsBowled/6)}.${b.ballsBowled%6})`; }
         
-        let hist = G.overHist.slice(-12).map(x=>{
-            if(x==='|') return `<span style="color:#ccc;margin:0 4px">|</span>`;
-            let c = 'ball-badge';
-            if(x===4) c+=' ball-4'; if(x===6) c+=' ball-6'; if(String(x).includes('W')) c+=' ball-w';
-            return `<div class="${c}">${x}</div>`;
-        }).join('');
-        document.getElementById('list-balls').innerHTML = hist;
+        if(G.overHist) {
+            let hist = G.overHist.slice(-12).map(x=>{
+                if(x==='|') return `<span style="color:#ccc;margin:0 4px">|</span>`;
+                let c = 'ball-badge';
+                if(x===4) c+=' ball-4'; if(x===6) c+=' ball-6'; if(String(x).includes('W')) c+=' ball-w';
+                return `<div class="${c}">${x}</div>`;
+            }).join('');
+            document.getElementById('list-balls').innerHTML = hist;
+        }
     }
 
     function openModal(t, opts) {
         document.getElementById('m-title').innerText = t;
         let b = document.getElementById('m-body'); b.innerHTML = "";
-        
         let isGrid = opts.length>2 && opts[0].txt.length<5;
         let c = document.createElement('div');
         if(isGrid) c.className="modal-grid";
-        
         opts.forEach(o=>{
-            let d=document.createElement('div');
-            d.className=isGrid?"modal-btn":"list-opt"; d.innerText=o.txt; d.onclick=o.fn;
-            c.appendChild(d);
+            let d=document.createElement('div'); d.className=isGrid?"modal-btn":"list-opt"; d.innerText=o.txt; d.onclick=o.fn; c.appendChild(d);
         });
         b.appendChild(c);
         document.getElementById('modal').style.display='flex';
     }
 
     function selectPlayer(t, l, cb) {
-        openModal(t, l.map(p=>({ txt: p, fn:()=>{
-            document.getElementById('modal').style.display='none'; cb(p);
-        }})));
+        openModal(t, l.map(p=>({ txt: p, fn:()=>{ document.getElementById('modal').style.display='none'; cb(p); }})));
     }
 
-    // ==========================================
-    // SCORECARD GENERATION (TV STYLE)
-    // ==========================================
+    // --- SCORECARD ---
     function generateAndShowCard() {
         let html = `<div class="sc-header">MATCH SUMMARY</div>`;
-        
-        // --- 1st Inning Data ---
-        // If inn=1, use current G. If inn=2, use G.inn1Data
         let d1 = (G.inn === 2 && G.inn1Data) ? G.inn1Data : (G.inn===1 ? G : null);
-        
-        if(d1) {
-            html += generateInningHTML("1st INNINGS", d1.batTeam, d1.bowlTeam, d1.score, d1.wkts, d1.balls, d1.stats);
-        }
-
-        // --- 2nd Inning Data ---
-        if(G.inn === 2) {
-            html += generateInningHTML("2nd INNINGS", G.batTeam, G.bowlTeam, G.score, G.wkts, G.balls, G.stats);
-        }
-
+        if(d1) html += generateInningHTML("1st INNINGS", d1.batTeam, d1.bowlTeam, d1.score, d1.wkts, d1.balls, d1.stats);
+        if(G.inn === 2) html += generateInningHTML("2nd INNINGS", G.batTeam, G.bowlTeam, G.score, G.wkts, G.balls, G.stats);
         document.getElementById('sc-card-content').innerHTML = html;
         document.getElementById('full-sc-overlay').style.display = 'block';
     }
-
     function generateInningHTML(title, batT, bowlT, sc, wk, bl, statsRef) {
-        // BATSMAN TABLE - iterate using TEAM ARRAY (batT.p) for correct order (1 to last)
         let batRows = "";
         batT.p.forEach(name => {
             let s = statsRef[name];
-            // Show if played at least 1 ball or is out or is currently batting
             if(s.b > 0 || s.out || name === G.s || name === G.ns) {
                 let status = s.out ? (s.howOut || "out") : "not out";
-                batRows += `
-                    <tr>
-                        <td>
-                            <span class="sc-batter-name">${name}</span>
-                            <span class="sc-out-desc">${status}</span>
-                        </td>
-                        <td class="nums">${s.r}</td>
-                        <td class="nums">${s.b}</td>
-                        <td class="nums">${s['4']}</td>
-                        <td class="nums">${s['6']}</td>
-                        <td class="nums">${s.b ? (s.r*100/s.b).toFixed(0) : 0}</td>
-                    </tr>
-                `;
+                batRows += `<tr><td><span class="sc-batter-name">${name}</span><span class="sc-out-desc">${status}</span></td><td class="nums">${s.r}</td><td class="nums">${s.b}</td><td class="nums">${s['4']}</td><td class="nums">${s['6']}</td><td class="nums">${s.b ? (s.r*100/s.b).toFixed(0) : 0}</td></tr>`;
             }
         });
-
-        // BOWLERS TABLE - iterate bowlT.p
         let bowlRows = "";
         bowlT.p.forEach(name => {
             let s = statsRef[name];
             if(s.ballsBowled > 0) {
                 let ov = Math.floor(s.ballsBowled/6) + "." + (s.ballsBowled%6);
                 let eco = s.ballsBowled ? (s.br*6/s.ballsBowled).toFixed(1) : 0;
-                bowlRows += `
-                    <tr>
-                        <td>${name}</td>
-                        <td class="nums">${ov}</td>
-                        <td class="nums">${s.br}</td>
-                        <td class="nums">${s.bw}</td>
-                        <td class="nums">${eco}</td>
-                    </tr>
-                `;
+                bowlRows += `<tr><td>${name}</td><td class="nums">${ov}</td><td class="nums">${s.br}</td><td class="nums">${s.bw}</td><td class="nums">${eco}</td></tr>`;
             }
         });
-
-        return `
-            <div class="sc-inning-box">
-                <div class="sc-inning-title">
-                    <span>${batT.name}</span>
-                    <span>${sc}/${wk} (${Math.floor(bl/6)}.${bl%6})</span>
-                </div>
-                
-                <table class="sc-table">
-                    <tr><th>Batter</th><th class="nums">R</th><th class="nums">B</th><th class="nums">4s</th><th class="nums">6s</th><th class="nums">SR</th></tr>
-                    ${batRows}
-                </table>
-
-                <div style="background:#f9f9f9; padding:5px; font-weight:bold; font-size:0.75rem; color:#555; border-top:1px solid #ddd; margin-top:5px">BOWLING</div>
-                <table class="sc-table">
-                    <tr><th>Bowler</th><th class="nums">O</th><th class="nums">R</th><th class="nums">W</th><th class="nums">Eco</th></tr>
-                    ${bowlRows}
-                </table>
-            </div>
-        `;
+        return `<div class="sc-inning-box"><div class="sc-inning-title"><span>${batT.name}</span><span>${sc}/${wk} (${Math.floor(bl/6)}.${bl%6})</span></div><table class="sc-table"><tr><th>Batter</th><th class="nums">R</th><th class="nums">B</th><th class="nums">4s</th><th class="nums">6s</th><th class="nums">SR</th></tr>${batRows}</table><div style="background:#f9f9f9; padding:5px; font-weight:bold; font-size:0.75rem; color:#555; border-top:1px solid #ddd; margin-top:5px">BOWLING</div><table class="sc-table"><tr><th>Bowler</th><th class="nums">O</th><th class="nums">R</th><th class="nums">W</th><th class="nums">Eco</th></tr>${bowlRows}</table></div>`;
     }
-
     function downloadScorecard() {
         const el = document.getElementById('sc-card-content');
         html2canvas(el, { scale: 2, useCORS: true }).then(canvas => {
@@ -789,35 +804,26 @@
         });
     }
 
-    // ==========================================
-    // WATCH MODE (NO ID)
-    // ==========================================
+    // --- WATCH ---
     function openMatchList() {
         if(!db) return alert("Firebase not set!");
         document.getElementById('home-screen').style.display='none';
         document.getElementById('match-list-screen').style.display='flex';
-        
         let c = document.getElementById('live-list-container');
         c.innerHTML = "<div style='text-align:center; padding:20px; color:#888'>Scanning...</div>";
-
         db.ref('active_matches').once('value').then(snap => {
             let data = snap.val();
             c.innerHTML = "";
-            if(!data) {
-                c.innerHTML = "<div style='text-align:center; padding:20px;'>No active matches found.</div>";
-                return;
-            }
+            if(!data) { c.innerHTML = "<div style='text-align:center; padding:20px;'>No active matches.</div>"; return; }
             Object.keys(data).forEach(k => {
                 let m = data[k];
-                let div = document.createElement('div');
-                div.className = "match-list-item";
+                let div = document.createElement('div'); div.className = "match-list-item";
                 div.innerHTML = `<div class="m-title">${m.name}</div><div class="m-sub">Started recently</div>`;
                 div.onclick = () => watchMatch(k);
                 c.appendChild(div);
             });
         });
     }
-
     function watchMatch(mid) {
         isScorer = false;
         document.getElementById('match-list-screen').style.display='none';
@@ -826,36 +832,50 @@
         document.getElementById('btn-add-ov').style.display='none';
         document.getElementById('btn-exit').style.display='none';
         document.getElementById('watch-msg').style.display='block';
-        
-        db.ref('matches/' + mid).on('value', snap => {
-            let val = snap.val();
-            if(val) { G = val; updateUI(); }
-        });
+        db.ref('matches/' + mid).on('value', snap => { let val = snap.val(); if(val) { G = val; updateUI(); } });
     }
 
-    // Persistence Helpers
-    function saveGameLocal() {
-        if(isScorer && G.matchStarted) {
-            localStorage.setItem('gully_active', JSON.stringify(G));
-            localStorage.setItem('gully_mid', matchId);
+    // Persistence with Crash Protection
+    function saveGameLocal() { 
+        if(isScorer && G.matchStarted) { 
+            try {
+                // IMPORTANT: Don't save recursive history to LocalStorage either
+                let stateToSave = { ...G };
+                delete stateToSave.history;
+                localStorage.setItem('gully_active', JSON.stringify(stateToSave)); 
+                localStorage.setItem('gully_mid', matchId); 
+            } catch(e){}
         }
     }
-    function checkActiveMatch() {
-        if(localStorage.getItem('gully_active')) document.getElementById('btn-resume').style.display='flex';
+    function checkActiveMatch() { 
+        try { if(localStorage.getItem('gully_active')) document.getElementById('btn-resume').style.display='flex'; } catch(e){}
     }
-    function resumeMatch() {
-        G = JSON.parse(localStorage.getItem('gully_active'));
-        matchId = localStorage.getItem('gully_mid');
-        document.getElementById('home-screen').style.display='none';
-        document.getElementById('game-ui').style.display='flex';
-        updateUI(); syncOnline();
+    function resumeMatch() { 
+        try {
+            G = JSON.parse(localStorage.getItem('gully_active')); 
+            // Re-initialize history as empty array on resume to prevent old history from crashing
+            G.history = [];
+            matchId = localStorage.getItem('gully_mid'); 
+            document.getElementById('home-screen').style.display='none'; 
+            document.getElementById('game-ui').style.display='flex'; 
+            updateUI(); syncOnline(); 
+        } catch(e) { clearActiveMatch(); alert("Save corrupted"); }
     }
-    function clearActiveMatch() {
-        localStorage.removeItem('gully_active'); localStorage.removeItem('gully_mid');
-        G.matchStarted=false;
+    function clearActiveMatch() { 
+        try {
+            localStorage.removeItem('gully_active'); 
+            localStorage.removeItem('gully_mid'); 
+            G.matchStarted=false; 
+        } catch(e){}
     }
-    function syncOnline() {
-        if(db && matchId && isScorer) db.ref('matches/'+matchId).set(G);
+    function syncOnline() { 
+        if(db && matchId && isScorer) {
+            try { 
+                let stateToSync = { ...G };
+                delete stateToSync.history; // Don't sync history to Firebase
+                db.ref('matches/'+matchId).set(stateToSync); 
+            } catch(e){}
+        }
     }
 </script>
 </body>
