@@ -264,7 +264,8 @@
             <button class="btn-action" style="background:#0084ff" onclick="generateAndShowCard()">
                 📸 View & Share Scorecard
             </button>
-            <button class="btn-action" id="btn-exit" style="margin-top:10px; background:#d32f2f" onclick="exitMatch()">🛑 Exit Match</button>
+            <button class="btn-action" id="btn-exit" style="margin-top:25px; margin-bottom: 20px; background:#d32f2f" onclick="exitMatch()">🛑 Exit Match</button>
+            <div style="height:30px"></div>
         </div>
 
         <div class="controls" id="controls-panel">
@@ -276,7 +277,7 @@
             <button class="key k-6" onclick="run(6)">6</button>
             <button class="key" style="background:#607d8b; color:white; font-size:1rem" onclick="extra('WD')">WD</button>
             <button class="key" style="background:#607d8b; color:white; font-size:1rem" onclick="askNoBall()">NB</button>
-            <button class="key k-w" onclick="wicket('BOWLED')">OUT</button>
+            <button class="key k-w" onclick="confirmWicket()">OUT</button>
             <button class="key k-w" style="background:#e65100" onclick="wicket('RUNOUT')">RO</button>
             <button class="key k-undo" onclick="undo()">⎌</button>
         </div>
@@ -540,7 +541,31 @@
             }
         })));
     }
-    function wicket(type) {
+
+    // --- UPDATED WICKET LOGIC STARTS HERE ---
+    function confirmWicket() {
+        openModal("Select Wicket Type", [
+            { txt: "🏏 Caught", fn: () => processCatch() },
+            { txt: "🎯 Bowled / LBW", fn: () => wicket('BOWLED') } // Treated as normal out
+        ]);
+    }
+
+    function processCatch() {
+        openModal("Assign Fielder?", [
+            { txt: "Yes (Select Fielder)", fn: () => {
+                document.getElementById('modal').style.display='none';
+                selectPlayer("Who took catch?", G.bowlTeam.p, (fielder) => {
+                    let desc = `c ${fielder} b ${G.b}`;
+                    wicket('CAUGHT', desc);
+                });
+            }},
+            { txt: "No (Direct Catch)", fn: () => {
+                wicket('CAUGHT', `c (Sub) b ${G.b}`);
+            }}
+        ]);
+    }
+
+    function wicket(type, customDesc = null) {
         if(type === 'RUNOUT') {
             openModal("Who Run Out?", [ 
                 { txt: G.s, fn:()=>askRoRuns(G.s) }, 
@@ -549,12 +574,22 @@
         } else {
             saveState();
             G.wkts++; G.balls++;
-            G.stats[G.s].b++; G.stats[G.s].out = true; G.stats[G.s].howOut = type;
+            G.stats[G.s].b++; G.stats[G.s].out = true; 
+            
+            // Set how out string
+            if(customDesc) {
+                G.stats[G.s].howOut = customDesc;
+            } else {
+                G.stats[G.s].howOut = (type === 'BOWLED') ? `b ${G.b}` : type;
+            }
+
             G.stats[G.b].bw++; G.stats[G.b].ballsBowled++;
             G.overHist.push("W");
             handleWicket(G.s);
         }
     }
+    // --- UPDATED WICKET LOGIC ENDS HERE ---
+
     function askRoRuns(who) {
         openModal("Runs completed?", [0,1,2,3].map(r => ({
             txt: r + " Runs", fn: () => {
@@ -573,6 +608,9 @@
         })));
     }
     function handleWicket(whoOut) {
+        // If "OUT" button was clicked, hide the modal first if open
+        document.getElementById('modal').style.display = 'none';
+
         if(G.wkts >= G.batTeam.p.length) {
             initiateInningsEnd();
         } 
