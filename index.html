@@ -290,19 +290,25 @@
         </div>
     </div>
 
-    <div id="full-sc-overlay" class="full-sc-overlay">
-        <div style="display:flex; justify-content:space-between; max-width:600px; margin:0 auto; padding:10px 5px">
-            <button id="sc-close-btn" onclick="document.getElementById('full-sc-overlay').style.display='none'" style="background:#d32f2f; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">✖ Close</button>
+<div id="full-sc-overlay" class="full-sc-overlay">
+        <div style="display:flex; justify-content:flex-end; max-width:600px; margin:0 auto; padding:10px 5px">
             <button id="sc-home-btn" onclick="location.reload()" style="display:none; background:var(--green); color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">🏠 Home Screen</button>
         </div>
+        
         <div id="sc-card-content" class="sc-card-container"></div>
-        <div style="text-align:center; margin-top:15px; padding-bottom:30px;">
-            <button onclick="downloadScorecard()" style="background:#0084ff; color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; font-size:1.1rem; box-shadow:0 4px 10px rgba(0,0,0,0.3)">
+        
+        <div style="display:flex; justify-content:center; gap:15px; margin-top:15px; padding-bottom:30px; flex-wrap:wrap;">
+            
+            <button id="sc-close-btn" onclick="document.getElementById('full-sc-overlay').style.display='none'" style="background:#d32f2f; color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; font-size:1.1rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
+                ✖ Close
+            </button>
+
+            <button onclick="downloadScorecard()" style="background:#0084ff; color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; font-size:1.1rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
                 📥 Download / Share
             </button>
+            
         </div>
-    </div>
-
+</div>
     <div id="modal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="m-title" style="margin-top:0">Title</h3>
