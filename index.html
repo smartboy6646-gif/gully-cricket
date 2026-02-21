@@ -291,16 +291,17 @@
     </div>
 
 <div id="full-sc-overlay" class="full-sc-overlay">
-        <div style="display:flex; justify-content:flex-end; max-width:600px; margin:0 auto; padding:10px 5px">
-            <button id="sc-home-btn" onclick="location.reload()" style="display:none; background:var(--green); color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">🏠 Home Screen</button>
-        </div>
         
-        <div id="sc-card-content" class="sc-card-container"></div>
+        <div id="sc-card-content" class="sc-card-container" style="margin-top:20px;"></div>
         
-        <div style="display:flex; justify-content:center; gap:15px; margin-top:15px; padding-bottom:30px; flex-wrap:wrap;">
+        <div style="display:flex; justify-content:center; gap:15px; margin-top:20px; padding-bottom:30px; flex-wrap:wrap;">
             
             <button id="sc-close-btn" onclick="document.getElementById('full-sc-overlay').style.display='none'" style="background:#d32f2f; color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; font-size:1.1rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
                 ✖ Close
+            </button>
+
+            <button id="sc-home-btn" onclick="location.reload()" style="display:none; background:var(--green); color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; font-size:1.1rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
+                🏠 Home Screen
             </button>
 
             <button onclick="downloadScorecard()" style="background:#0084ff; color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; font-size:1.1rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
@@ -359,7 +360,8 @@
         matchStarted: false,
         inn1Data: null,
         isSingleBatting: false,
-        matchEnded: false
+        matchEnded: false,
+        matchResult: "" // Added variable to track runs/wickets win margin
     };
 
     window.onload = function() {
@@ -459,7 +461,8 @@
             matchStarted: true,
             inn1Data: null,
             isSingleBatting: false,
-            matchEnded: false
+            matchEnded: false,
+            matchResult: ""
         };
         matchId = "m_" + Date.now();
         saveGameLocal();
@@ -511,6 +514,7 @@
             G.inn = prev.inn; G.target = prev.target; G.inn1Data = prev.inn1Data;
             G.isSingleBatting = prev.isSingleBatting || false;
             G.matchEnded = prev.matchEnded || false;
+            G.matchResult = prev.matchResult || "";
             
             updateUI(); syncOnline(); saveGameLocal();
         } catch(e) { alert("Error undoing"); console.error(e); }
@@ -548,11 +552,10 @@
         })));
     }
 
-    // --- UPDATED WICKET LOGIC STARTS HERE ---
     function confirmWicket() {
         openModal("Select Wicket Type", [
             { txt: "🏏 Caught", fn: () => processCatch() },
-            { txt: "🎯 Bowled / LBW", fn: () => wicket('BOWLED') } // Treated as normal out
+            { txt: "🎯 Bowled / LBW", fn: () => wicket('BOWLED') }
         ]);
     }
 
@@ -582,7 +585,6 @@
             G.wkts++; G.balls++;
             G.stats[G.s].b++; G.stats[G.s].out = true; 
             
-            // Set how out string
             if(customDesc) {
                 G.stats[G.s].howOut = customDesc;
             } else {
@@ -594,7 +596,6 @@
             handleWicket(G.s);
         }
     }
-    // --- UPDATED WICKET LOGIC ENDS HERE ---
 
     function askRoRuns(who) {
         openModal("Runs completed?", [0,1,2,3].map(r => ({
@@ -613,8 +614,8 @@
             }
         })));
     }
+    
     function handleWicket(whoOut) {
-        // If "OUT" button was clicked, hide the modal first if open
         document.getElementById('modal').style.display = 'none';
 
         if(G.wkts >= G.batTeam.p.length) {
@@ -671,9 +672,6 @@
     }
     function addOver() { if(confirm("Add 1 Over?")) { G.totalOvers++; updateUI(); syncOnline(); saveGameLocal(); } }
 
-    // ==========================================
-    // 10-SEC COUNTDOWN & UNDO LOGIC
-    // ==========================================
     function initiateInningsEnd() {
         updateUI(); 
         syncOnline(); 
@@ -732,12 +730,21 @@
             let temp = G.batTeam; G.batTeam = G.bowlTeam; G.bowlTeam = temp;
             startInnings();
         } else {
+            // NEW MATCH RESULT LOGIC
             let res = "";
-            if (G.score > G.target - 1) res = `${G.batTeam.name} Won!`;
-            else if (G.score === G.target - 1) res = "Match Tied!";
-            else res = `${G.bowlTeam.name} Won!`;
+            if (G.score >= G.target) {
+                let wktsLeft = G.batTeam.p.length - G.wkts;
+                res = `${G.batTeam.name} Won by ${wktsLeft} wicket${wktsLeft !== 1 ? 's' : ''}`;
+            } else if (G.score === G.target - 1) {
+                res = "Match Tied!";
+            } else {
+                let runsShort = (G.target - 1) - G.score;
+                res = `${G.bowlTeam.name} Won by ${runsShort} run${runsShort !== 1 ? 's' : ''}`;
+            }
             
+            G.matchResult = res; // Save to global object
             saveMatchToHistory(res);
+            
             if(db && isScorer && matchId) {
                 try { db.ref('active_matches/'+matchId).remove(); } catch(e){}
             }
@@ -765,7 +772,7 @@
                 id: matchId,
                 date: new Date().toLocaleDateString('en-CA'),
                 res: res,
-                desc: `${G.batTeam.name} vs ${G.bowlTeam.name}`,
+                desc: `${G.inn1Data ? G.inn1Data.batTeam.name : G.batTeam.name} vs ${G.inn1Data ? G.inn1Data.bowlTeam.name : G.bowlTeam.name}`,
                 inn1: G.inn1Data,
                 inn2: { score:G.score, wkts:G.wkts, balls:G.balls, stats:G.stats }
             };
@@ -790,7 +797,7 @@
         } else {
             listDiv.innerHTML = todayMatches.map(m => `
                 <div class="match-list-item" style="border-left-color:var(--primary)">
-                    <div class="m-title">${m.res}</div>
+                    <div class="m-title" style="color:var(--green)">${m.res}</div>
                     <div class="m-sub">${m.desc}</div>
                 </div>
             `).join('');
@@ -914,6 +921,12 @@
         }
 
         let html = `<div class="sc-header" style="background:var(--primary); color:white; padding:10px; text-align:center; font-weight:bold;">MATCH SUMMARY</div>`;
+        
+        // ADDED CLEAR RESULT BANNER
+        if (G.matchEnded && G.matchResult) {
+            html += `<div style="background:#fff3e0; color:#e65100; text-align:center; padding:12px; font-weight:bold; font-size:1.1rem; border-bottom:1px solid #ffe0b2;">🏆 ${G.matchResult}</div>`;
+        }
+
         let d1 = (G.inn === 2 && G.inn1Data) ? G.inn1Data : (G.inn===1 ? G : null);
         if(d1) html += generateInningHTML("1st INNINGS", d1.batTeam, d1.bowlTeam, d1.score, d1.wkts, d1.balls, d1.stats);
         if(G.inn === 2) html += generateInningHTML("2nd INNINGS", G.batTeam, G.bowlTeam, G.score, G.wkts, G.balls, G.stats);
@@ -977,7 +990,6 @@
             let now = Date.now();
             Object.keys(data).forEach(k => {
                 let m = data[k];
-                // Auto delete 30 mins (1800000 ms) idle matches
                 if (!m.timestamp || (now - m.timestamp > 1800000)) {
                     db.ref('active_matches/'+k).remove();
                     db.ref('matches/'+k).remove();
@@ -1050,7 +1062,6 @@
                 let stateToSync = { ...G };
                 delete stateToSync.history;
                 db.ref('matches/'+matchId).set(stateToSync); 
-                // Update timestamp for 30min timeout logic
                 db.ref('active_matches/'+matchId).update({ timestamp: Date.now() });
             } catch(e){}
         }
