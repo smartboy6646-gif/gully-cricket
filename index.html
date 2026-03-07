@@ -156,9 +156,61 @@
             <p style="color:#666; font-weight:bold; font-size:0.9rem; margin:5px 0 15px 0;">Created by Ronnie Ruchal</p>
         </div>
         <button id="btn-resume" class="home-btn" style="background:var(--green); color:white; display:none" onclick="resumeMatch()">▶ Resume Match</button>
-        <button class="home-btn" style="background:var(--accent); color:var(--primary)" onclick="startSetup()">Start New Match</button>
+        
+        <button class="home-btn" style="background:var(--accent); color:var(--primary)" onclick="selectMode('FULL')">🏏 Full Scorecard</button>
+        <button class="home-btn" style="background:#0084ff; color:white" onclick="selectMode('GULLY')">📝 Gully Scoreboard (Quick)</button>
+
         <button class="home-btn" style="background:white; color:#333" onclick="openMatchList()">🔴 Watch Live (No ID)</button>
         <button class="home-btn" style="background:white; color:#333" onclick="showHistory()">📜 Today's History & Stats</button>
+    </div>
+
+    <div id="setup-screen" class="setup-screen" style="display:none">
+        <div class="setup-top">
+            <h3 style="margin:0">Full Match Setup</h3>
+            <div class="team-names-row">
+                <input id="ta-name" class="inp-tm" value="Team A" oninput="saveTeamsLocal()" style="color:var(--primary); background:#e8eaf6">
+                <input id="tb-name" class="inp-tm" value="Team B" oninput="saveTeamsLocal()" style="color:#e65100; background:#fff3e0">
+            </div>
+        </div>
+        <div class="setup-body">
+            <div class="col-team" id="list-ta"></div>
+            <div class="col-pool">
+                <div style="display:flex; gap:5px; width:100%; margin-bottom:10px">
+                    <input type="text" id="inp-pool" style="flex:1; padding:8px" placeholder="Names (e.g. Ram,Shyam)">
+                    <button onclick="addToPool()" style="background:var(--primary); color:white; border:none; padding:0 15px; font-weight:bold">+</button>
+                </div>
+                <div id="list-pool" style="width:100%"></div>
+            </div>
+            <div class="col-team" id="list-tb"></div>
+        </div>
+        <div class="setup-footer">
+            <input type="number" id="inp-overs" class="overs-input" placeholder="Overs" value="5">
+            <div style="display:flex; gap:10px; width:100%">
+                <button class="btn-action" style="background:#555; width:40%" onclick="resetSetup()">Reset</button>
+                <button class="btn-action" style="background:var(--green); width:60%" onclick="proceedToToss()">NEXT: TOSS &raquo;</button>
+            </div>
+            <button class="btn-action" style="background:#d32f2f; width:100%; margin-top:5px;" onclick="document.getElementById('setup-screen').style.display='none'; document.getElementById('home-screen').style.display='flex'">Cancel</button>
+        </div>
+    </div>
+
+    <div id="gully-setup-screen" class="setup-screen" style="display:none">
+        <div class="setup-top">
+            <h3 style="margin:0">Quick Match Setup (Gully Mode)</h3>
+        </div>
+        <div class="setup-body" style="flex-direction:column; padding:30px 20px; align-items:center; gap:20px; background:#f4f6f8">
+            <input id="g-ta-name" class="overs-input" value="Team A" placeholder="Team A Name">
+            <span style="font-weight:bold; color:#777; font-size:1.2rem">VS</span>
+            <input id="g-tb-name" class="overs-input" value="Team B" placeholder="Team B Name">
+            
+            <div style="width:100%; border-top:1px solid #ccc; margin-top:10px; padding-top:20px;">
+                <label style="font-weight:bold; color:#555; display:block; text-align:center; margin-bottom:5px">Total Overs:</label>
+                <input type="number" id="g-inp-overs" class="overs-input" placeholder="Overs" value="5">
+            </div>
+        </div>
+        <div class="setup-footer">
+            <button class="btn-action" style="background:var(--green); width:100%" onclick="proceedToTossGully()">NEXT: TOSS &raquo;</button>
+            <button class="btn-action" style="background:#d32f2f; width:100%; margin-top:10px;" onclick="document.getElementById('gully-setup-screen').style.display='none'; document.getElementById('home-screen').style.display='flex'">Cancel</button>
+        </div>
     </div>
 
     <div id="history-screen" class="history-screen" style="display:none; background:#f4f6f8">
@@ -191,34 +243,6 @@
         <div id="live-list-container" style="padding:10px; overflow-y:auto"></div>
     </div>
 
-    <div id="setup-screen" class="setup-screen" style="display:none">
-        <div class="setup-top">
-            <h3 style="margin:0">Match Setup</h3>
-            <div class="team-names-row">
-                <input id="ta-name" class="inp-tm" value="Team A" oninput="saveTeamsLocal()" style="color:var(--primary); background:#e8eaf6">
-                <input id="tb-name" class="inp-tm" value="Team B" oninput="saveTeamsLocal()" style="color:#e65100; background:#fff3e0">
-            </div>
-        </div>
-        <div class="setup-body">
-            <div class="col-team" id="list-ta"></div>
-            <div class="col-pool">
-                <div style="display:flex; gap:5px; width:100%; margin-bottom:10px">
-                    <input type="text" id="inp-pool" style="flex:1; padding:8px" placeholder="Names (e.g. Ram,Shyam)">
-                    <button onclick="addToPool()" style="background:var(--primary); color:white; border:none; padding:0 15px; font-weight:bold">+</button>
-                </div>
-                <div id="list-pool" style="width:100%"></div>
-            </div>
-            <div class="col-team" id="list-tb"></div>
-        </div>
-        <div class="setup-footer">
-            <input type="number" id="inp-overs" class="overs-input" placeholder="Overs" value="5">
-            <div style="display:flex; gap:10px; width:100%">
-                <button class="btn-action" style="background:#555; width:40%" onclick="resetSetup()">Reset</button>
-                <button class="btn-action" style="background:var(--green); width:60%" onclick="proceedToToss()">NEXT: TOSS &raquo;</button>
-            </div>
-        </div>
-    </div>
-
     <div id="game-ui" class="app-container" style="display:none">
         <div class="tv-header">
             <div class="match-info">
@@ -239,7 +263,7 @@
 
         <div id="msg-need" class="match-status"></div>
 
-        <div class="live-bar">
+        <div class="live-bar" id="live-bar">
             <div class="player-box active-bat" id="box-s">
                 <span class="p-name" id="name-s">Striker</span>
                 <span class="p-runs" id="stat-s">0(0)</span>
@@ -261,6 +285,10 @@
             </div>
             <div style="flex:1"></div>
             
+            <button class="btn-action" id="btn-declare" style="background:#f57c00; margin-bottom:10px;" onclick="manualEndInnings()">
+                🏳️ End 1st Innings
+            </button>
+
             <button class="btn-action" style="background:#0084ff" onclick="generateAndShowCard()">
                 📸 View & Share Scorecard
             </button>
@@ -339,6 +367,9 @@
     let isScorer = true;
     let watchRef = null;
     let endTimer = null;
+    
+    // NEW MODE TRACKER
+    let appMode = 'FULL'; // 'FULL' or 'GULLY'
 
     if (firebaseConfig.databaseURL && typeof firebase !== 'undefined') {
         try {
@@ -350,6 +381,7 @@
     let pool = [], ta = [], tb = [];
     
     let G = {
+        appMode: 'FULL',
         batTeam: null, bowlTeam: null,
         inn: 1, target: 0,
         score: 0, wkts: 0, balls: 0,
@@ -361,7 +393,7 @@
         inn1Data: null,
         isSingleBatting: false,
         matchEnded: false,
-        matchResult: "" // Added variable to track runs/wickets win margin
+        matchResult: "" 
     };
 
     window.onload = function() {
@@ -373,6 +405,19 @@
         checkActiveMatch();
     };
 
+    // MODE SELECTION
+    function selectMode(mode) {
+        appMode = mode;
+        document.getElementById('home-screen').style.display = 'none';
+        if(mode === 'FULL') {
+            document.getElementById('setup-screen').style.display = 'flex';
+            renderSetup();
+        } else {
+            document.getElementById('gully-setup-screen').style.display = 'flex';
+        }
+    }
+
+    // FULL MODE SETUP
     function saveTeamsLocal() {
         try {
             let nA = document.getElementById('ta-name').value;
@@ -392,12 +437,6 @@
                 document.getElementById('tb-name').value = p.tbName || "Team B";
             }
         } catch(e){}
-        renderSetup();
-    }
-    function startSetup() {
-        document.getElementById('home-screen').style.display = 'none';
-        document.getElementById('setup-screen').style.display = 'flex';
-        renderSetup();
     }
     function addToPool() {
         let val = document.getElementById('inp-pool').value;
@@ -426,7 +465,55 @@
         if(confirm("Clear all?")) { pool=[]; ta=[]; tb=[]; renderSetup(); saveTeamsLocal(); }
     }
 
-    // --- GAME LOGIC ---
+    // --- GULLY SETUP LOGIC ---
+    function proceedToTossGully() {
+        let nA = document.getElementById('g-ta-name').value || "Team A";
+        let nB = document.getElementById('g-tb-name').value || "Team B";
+        let ov = parseInt(document.getElementById('g-inp-overs').value)||5;
+        openModal("🪙 Who Won Toss?", [
+            { txt: nA, fn:()=>postTossGully(nA, nB, ov) },
+            { txt: nB, fn:()=>postTossGully(nB, nA, ov) }
+        ]);
+    }
+    function postTossGully(wN, lN, ov) {
+        openModal(`${wN} elected to?`, [
+            { txt: "🏏 BAT", fn:()=>initGameGully(wN, lN, ov) },
+            { txt: "⚽ BOWL", fn:()=>initGameGully(lN, wN, ov) }
+        ]);
+    }
+    function initGameGully(batN, bowlN, ov) {
+        G = {
+            appMode: 'GULLY',
+            batTeam: { name: batN, p: [] },
+            bowlTeam: { name: bowlN, p: [] },
+            inn: 1, target: 0,
+            score: 0, wkts: 0, balls: 0,
+            totalOvers: ov,
+            s: null, ns: null, b: null,
+            stats: {},
+            overHist: [], history: [],
+            matchStarted: true,
+            inn1Data: null,
+            isSingleBatting: false,
+            matchEnded: false,
+            matchResult: ""
+        };
+        appMode = 'GULLY';
+        matchId = "m_" + Date.now();
+        saveGameLocal();
+        
+        if(db) {
+            try { db.ref('active_matches/' + matchId).set({ name: `${batN} vs ${bowlN}`, timestamp: Date.now() }); } catch(e) {}
+        }
+
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('gully-setup-screen').style.display = 'none';
+        document.getElementById('game-ui').style.display = 'flex';
+        updateUI(); syncOnline();
+    }
+
+
+    // --- FULL GAME LOGIC ---
     function proceedToToss() {
         if(ta.length<2 || tb.length<2) return alert("Min 2 players/team");
         let nA = document.getElementById('ta-name').value;
@@ -450,6 +537,7 @@
 
     function initGame(batN, batSq, bowlN, bowlSq, ov) {
         G = {
+            appMode: 'FULL',
             batTeam: { name: batN, p: batSq },
             bowlTeam: { name: bowlN, p: bowlSq },
             inn: 1, target: 0,
@@ -464,13 +552,12 @@
             matchEnded: false,
             matchResult: ""
         };
+        appMode = 'FULL';
         matchId = "m_" + Date.now();
         saveGameLocal();
         
         if(db) {
-            try {
-                db.ref('active_matches/' + matchId).set({ name: `${batN} vs ${bowlN}`, timestamp: Date.now() });
-            } catch(e) { console.log("Offline mode"); }
+            try { db.ref('active_matches/' + matchId).set({ name: `${batN} vs ${bowlN}`, timestamp: Date.now() }); } catch(e) {}
         }
 
         document.getElementById('modal').style.display = 'none';
@@ -515,6 +602,7 @@
             G.isSingleBatting = prev.isSingleBatting || false;
             G.matchEnded = prev.matchEnded || false;
             G.matchResult = prev.matchResult || "";
+            G.appMode = prev.appMode || 'FULL';
             
             updateUI(); syncOnline(); saveGameLocal();
         } catch(e) { alert("Error undoing"); console.error(e); }
@@ -523,29 +611,39 @@
     function run(r) {
         saveState();
         G.score += r; G.balls++;
-        let s = G.stats[G.s]; s.r+=r; s.b++;
-        if(r===4) s[4]++; if(r===6) s[6]++;
-        let b = G.stats[G.b]; b.br+=r; b.ballsBowled++;
+        if (appMode === 'FULL') {
+            let s = G.stats[G.s]; s.r+=r; s.b++;
+            if(r===4) s[4]++; if(r===6) s[6]++;
+            let b = G.stats[G.b]; b.br+=r; b.ballsBowled++;
+        }
         G.overHist.push(r);
         if(r%2!==0) swap();
         checkGameStatus();
     }
+    
     function extra(type) {
         saveState();
-        G.score++; G.stats[G.b].br++; G.overHist.push(type);
+        G.score++; G.overHist.push(type);
+        if(appMode === 'FULL') G.stats[G.b].br++; 
         checkGameStatus();
     }
+    
     function askNoBall() {
         openModal("No Ball: Runs off bat?", [0,1,2,3,4,6].map(r => ({
             txt: "+" + r, fn: () => {
                 document.getElementById('modal').style.display = 'none';
                 saveState();
-                G.score += (1+r); G.stats[G.b].br += (1+r);
-                if(r>0) {
-                    let s = G.stats[G.s]; s.r+=r; s.b++;
-                    if(r===4) s[4]++; if(r===6) s[6]++;
-                    if(r%2!==0) swap();
+                G.score += (1+r); 
+                
+                if (appMode === 'FULL') {
+                    G.stats[G.b].br += (1+r);
+                    if(r>0) {
+                        let s = G.stats[G.s]; s.r+=r; s.b++;
+                        if(r===4) s[4]++; if(r===6) s[6]++;
+                    }
                 }
+                
+                if(r%2!==0) swap();
                 G.overHist.push("NB+" + r);
                 checkGameStatus();
             }
@@ -553,10 +651,14 @@
     }
 
     function confirmWicket() {
-        openModal("Select Wicket Type", [
-            { txt: "🏏 Caught", fn: () => processCatch() },
-            { txt: "🎯 Bowled / LBW", fn: () => wicket('BOWLED') }
-        ]);
+        if (appMode === 'GULLY') {
+            wicket('GULLY_WICKET');
+        } else {
+            openModal("Select Wicket Type", [
+                { txt: "🏏 Caught", fn: () => processCatch() },
+                { txt: "🎯 Bowled / LBW", fn: () => wicket('BOWLED') }
+            ]);
+        }
     }
 
     function processCatch() {
@@ -576,25 +678,41 @@
 
     function wicket(type, customDesc = null) {
         if(type === 'RUNOUT') {
-            openModal("Who Run Out?", [ 
-                { txt: G.s, fn:()=>askRoRuns(G.s) }, 
-                (G.ns ? { txt: G.ns, fn:()=>askRoRuns(G.ns) } : { txt:"Cancel", fn:()=>{ document.getElementById('modal').style.display='none'; } })
-            ]);
+            if (appMode === 'GULLY') {
+                askRoRunsGully();
+            } else {
+                openModal("Who Run Out?", [ 
+                    { txt: G.s, fn:()=>askRoRuns(G.s) }, 
+                    (G.ns ? { txt: G.ns, fn:()=>askRoRuns(G.ns) } : { txt:"Cancel", fn:()=>{ document.getElementById('modal').style.display='none'; } })
+                ]);
+            }
         } else {
             saveState();
-            G.wkts++; G.balls++;
-            G.stats[G.s].b++; G.stats[G.s].out = true; 
+            G.wkts++; G.balls++; G.overHist.push("W");
             
-            if(customDesc) {
-                G.stats[G.s].howOut = customDesc;
-            } else {
-                G.stats[G.s].howOut = (type === 'BOWLED') ? `b ${G.b}` : type;
+            if (appMode === 'FULL') {
+                G.stats[G.s].b++; G.stats[G.s].out = true; 
+                if(customDesc) {
+                    G.stats[G.s].howOut = customDesc;
+                } else {
+                    G.stats[G.s].howOut = (type === 'BOWLED') ? `b ${G.b}` : type;
+                }
+                G.stats[G.b].bw++; G.stats[G.b].ballsBowled++;
             }
-
-            G.stats[G.b].bw++; G.stats[G.b].ballsBowled++;
-            G.overHist.push("W");
+            
             handleWicket(G.s);
         }
+    }
+
+    function askRoRunsGully() {
+        openModal("Runs completed?", [0,1,2,3].map(r => ({
+            txt: r + " Runs", fn: () => {
+                document.getElementById('modal').style.display='none';
+                saveState();
+                G.score += r; G.balls++; G.wkts++; G.overHist.push("W(RO)");
+                if(G.inn===2 && G.score >= G.target) initiateInningsEnd(); else handleWicket(null);
+            }
+        })));
     }
 
     function askRoRuns(who) {
@@ -618,23 +736,30 @@
     function handleWicket(whoOut) {
         document.getElementById('modal').style.display = 'none';
 
-        if(G.wkts >= G.batTeam.p.length) {
-            initiateInningsEnd();
-        } 
-        else if(G.wkts === G.batTeam.p.length - 1) {
-            openModal("Last Wicket! Allow Single Batting?", [
-                { txt: "✅ Yes (Single Bat)", fn: () => {
-                    document.getElementById('modal').style.display='none';
-                    G.isSingleBatting = true;
-                    G.s = (whoOut === G.s) ? G.ns : G.s;
-                    G.ns = null;
-                    checkGameStatus();
-                }},
-                { txt: "❌ No (End Innings)", fn: () => {
-                    document.getElementById('modal').style.display='none';
-                    initiateInningsEnd();
-                }}
-            ]);
+        if (appMode === 'GULLY') {
+            // Gully mode: No fixed wicket limit. Continue the game until overs finish or user declares.
+            checkGameStatus();
+            return;
+        }
+
+        if(G.wkts >= G.batTeam.p.length - 1) { // Normal cricket: 10 wickets = all out
+            if (G.wkts === G.batTeam.p.length - 1) {
+                openModal("Last Wicket! Allow Single Batting?", [
+                    { txt: "✅ Yes (Single Bat)", fn: () => {
+                        document.getElementById('modal').style.display='none';
+                        G.isSingleBatting = true;
+                        G.s = (whoOut === G.s) ? G.ns : G.s;
+                        G.ns = null;
+                        checkGameStatus();
+                    }},
+                    { txt: "❌ No (End Innings)", fn: () => {
+                        document.getElementById('modal').style.display='none';
+                        initiateInningsEnd();
+                    }}
+                ]);
+            } else {
+                initiateInningsEnd();
+            }
         }
         else {
             let notOut = (whoOut === G.s) ? G.ns : G.s;
@@ -647,7 +772,7 @@
     }
     
     function swap() { 
-        if(G.isSingleBatting || !G.s || !G.ns) return; 
+        if(appMode === 'GULLY' || G.isSingleBatting || !G.s || !G.ns) return; 
         [G.s, G.ns] = [G.ns, G.s]; 
     }
     
@@ -658,19 +783,30 @@
                 if(G.balls >= G.totalOvers * 6) { initiateInningsEnd(); return; }
                 else {
                     swap(); G.overHist.push("|");
-                    let avail = G.bowlTeam.p.filter(p => p !== G.b);
-                    setTimeout(() => {
-                        selectPlayer("Next Bowler", avail, (p) => { 
-                            G.b = p; updateUI(); syncOnline(); saveGameLocal(); 
-                        });
-                    }, 100);
-                    return; 
+                    if (appMode === 'FULL') {
+                        let avail = G.bowlTeam.p.filter(p => p !== G.b);
+                        setTimeout(() => {
+                            selectPlayer("Next Bowler", avail, (p) => { 
+                                G.b = p; updateUI(); syncOnline(); saveGameLocal(); 
+                            });
+                        }, 100);
+                        return;
+                    }
                 }
             }
             updateUI(); syncOnline(); saveGameLocal();
         } catch(e) { console.error("Game Loop Error", e); }
     }
+    
     function addOver() { if(confirm("Add 1 Over?")) { G.totalOvers++; updateUI(); syncOnline(); saveGameLocal(); } }
+
+    // --- MANUAL DECLARE INNINGS ---
+    function manualEndInnings() {
+        let msg = G.inn === 1 ? "Are you sure you want to end the 1st Innings?" : "Are you sure you want to end the Match?";
+        if(confirm(msg)) {
+            initiateInningsEnd();
+        }
+    }
 
     function initiateInningsEnd() {
         updateUI(); 
@@ -728,13 +864,22 @@
             G.score = 0; G.wkts = 0; G.balls = 0; G.overHist = [];
             G.isSingleBatting = false; 
             let temp = G.batTeam; G.batTeam = G.bowlTeam; G.bowlTeam = temp;
-            startInnings();
+            
+            if (appMode === 'FULL') {
+                startInnings();
+            } else {
+                updateUI(); syncOnline(); saveGameLocal();
+            }
         } else {
-            // NEW MATCH RESULT LOGIC
             let res = "";
             if (G.score >= G.target) {
-                let wktsLeft = G.batTeam.p.length - G.wkts;
-                res = `${G.batTeam.name} Won by ${wktsLeft} wicket${wktsLeft !== 1 ? 's' : ''}`;
+                // In Gully mode, wicket count may not be meaningful for winning margin, so we simply display it.
+                if (appMode === 'FULL') {
+                    let wktsLeft = G.batTeam.p.length - G.wkts;
+                    res = `${G.batTeam.name} Won by ${wktsLeft} wicket${wktsLeft !== 1 ? 's' : ''}`;
+                } else {
+                    res = `${G.batTeam.name} Won! (Chased Successfully)`;
+                }
             } else if (G.score === G.target - 1) {
                 res = "Match Tied!";
             } else {
@@ -742,7 +887,7 @@
                 res = `${G.bowlTeam.name} Won by ${runsShort} run${runsShort !== 1 ? 's' : ''}`;
             }
             
-            G.matchResult = res; // Save to global object
+            G.matchResult = res;
             saveMatchToHistory(res);
             
             if(db && isScorer && matchId) {
@@ -844,6 +989,15 @@
     // ==========================================
     function updateUI() {
         if(!G.matchStarted) return;
+        
+        document.getElementById('live-bar').style.display = (appMode === 'FULL') ? 'grid' : 'none';
+        
+        // Update declare button text based on innings
+        let btnDeclare = document.getElementById('btn-declare');
+        if (btnDeclare) {
+            btnDeclare.innerText = G.inn === 1 ? "🏳️ End 1st Innings" : "🏁 End Match";
+        }
+        
         document.getElementById('ui-inn').innerText = G.inn===1 ? "1st Innings" : `Target: ${G.target}`;
         document.getElementById('ui-team').innerText = G.batTeam.name;
         document.getElementById('sc-runs').innerText = G.score;
@@ -864,24 +1018,26 @@
             document.getElementById('msg-need').style.display = 'none';
         }
 
-        if(G.s) { 
-            let s=G.stats[G.s]; 
-            document.getElementById('name-s').innerText="🏏 "+G.s; 
-            document.getElementById('stat-s').innerText=`${s.r}(${s.b})`; 
-            document.getElementById('box-s').style.display = 'flex'; 
-        } else { document.getElementById('box-s').style.display = 'none'; }
-        
-        if(G.ns && !G.isSingleBatting) { 
-            let ns=G.stats[G.ns]; 
-            document.getElementById('name-ns').innerText=G.ns; 
-            document.getElementById('stat-ns').innerText=`${ns.r}(${ns.b})`; 
-            document.getElementById('box-ns').style.display = 'flex'; 
-        } else { 
-            document.getElementById('box-ns').style.display = 'none'; 
+        if(appMode === 'FULL') {
+            if(G.s) { 
+                let s=G.stats[G.s]; 
+                document.getElementById('name-s').innerText="🏏 "+G.s; 
+                document.getElementById('stat-s').innerText=`${s.r}(${s.b})`; 
+                document.getElementById('box-s').style.display = 'flex'; 
+            } else { document.getElementById('box-s').style.display = 'none'; }
+            
+            if(G.ns && !G.isSingleBatting) { 
+                let ns=G.stats[G.ns]; 
+                document.getElementById('name-ns').innerText=G.ns; 
+                document.getElementById('stat-ns').innerText=`${ns.r}(${ns.b})`; 
+                document.getElementById('box-ns').style.display = 'flex'; 
+            } else { 
+                document.getElementById('box-ns').style.display = 'none'; 
+            }
+            
+            if(G.b) { let b=G.stats[G.b]; document.getElementById('name-b').innerText=G.b; document.getElementById('stat-b').innerText=`${b.bw}-${b.br} (${Math.floor(b.ballsBowled/6)}.${b.ballsBowled%6})`; }
         }
-        
-        if(G.b) { let b=G.stats[G.b]; document.getElementById('name-b').innerText=G.b; document.getElementById('stat-b').innerText=`${b.bw}-${b.br} (${Math.floor(b.ballsBowled/6)}.${b.ballsBowled%6})`; }
-        
+
         if(G.overHist) {
             let hist = G.overHist.slice(-12).map(x=>{
                 if(x==='|') return `<span style="color:#ccc;margin:0 4px">|</span>`;
@@ -922,7 +1078,6 @@
 
         let html = `<div class="sc-header" style="background:var(--primary); color:white; padding:10px; text-align:center; font-weight:bold;">MATCH SUMMARY</div>`;
         
-        // ADDED CLEAR RESULT BANNER
         if (G.matchEnded && G.matchResult) {
             html += `<div style="background:#fff3e0; color:#e65100; text-align:center; padding:12px; font-weight:bold; font-size:1.1rem; border-bottom:1px solid #ffe0b2;">🏆 ${G.matchResult}</div>`;
         }
@@ -930,10 +1085,26 @@
         let d1 = (G.inn === 2 && G.inn1Data) ? G.inn1Data : (G.inn===1 ? G : null);
         if(d1) html += generateInningHTML("1st INNINGS", d1.batTeam, d1.bowlTeam, d1.score, d1.wkts, d1.balls, d1.stats);
         if(G.inn === 2) html += generateInningHTML("2nd INNINGS", G.batTeam, G.bowlTeam, G.score, G.wkts, G.balls, G.stats);
+        
         document.getElementById('sc-card-content').innerHTML = html;
         document.getElementById('full-sc-overlay').style.display = 'block';
     }
+    
     function generateInningHTML(title, batT, bowlT, sc, wk, bl, statsRef) {
+        if (appMode === 'GULLY') {
+            return `
+            <div class="sc-inning-box" style="margin-top:10px; border:1px solid #ddd; border-radius:5px;">
+                <div style="background:var(--primary); color:white; padding:8px; text-align:center; font-weight:bold; font-size:1.1rem; letter-spacing:1px; border-top-left-radius:5px; border-top-right-radius:5px;">
+                    ${title}
+                </div>
+                <div class="sc-inning-title" style="font-size:1.2rem; padding:15px; text-align:center; background:#fff; flex-direction:column; gap:5px;">
+                    <span style="display:block; font-weight:900; color:var(--primary); font-size:1.5rem;">${batT.name}</span>
+                    <span style="display:block; font-size:2rem; margin-top:10px;">${sc}/${wk}</span>
+                    <span style="display:block; font-size:1rem; color:#666; margin-top:5px;">Overs: ${Math.floor(bl/6)}.${bl%6}</span>
+                </div>
+            </div>`;
+        }
+        
         let batRows = "";
         batT.p.forEach(name => {
             let s = statsRef[name];
@@ -965,6 +1136,7 @@
             <table class="sc-table"><tr><th>Bowler</th><th class="nums">O</th><th class="nums">R</th><th class="nums">W</th><th class="nums">Eco</th></tr>${bowlRows}</table>
         </div>`;
     }
+    
     function downloadScorecard() {
         const el = document.getElementById('sc-card-content');
         html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
@@ -1010,11 +1182,18 @@
         document.getElementById('controls-panel').style.display='none';
         document.getElementById('btn-add-ov').style.display='none';
         document.getElementById('btn-exit').style.display='none';
+        // Watchers shouldn't declare the innings!
+        let btnDeclare = document.getElementById('btn-declare');
+        if(btnDeclare) btnDeclare.style.display='none';
         document.getElementById('watch-msg').style.display='block';
         watchRef = db.ref('matches/' + mid);
         watchRef.on('value', snap => { 
             let val = snap.val(); 
-            if(val) { G = val; updateUI(); } 
+            if(val) { 
+                G = val; 
+                appMode = G.appMode || 'FULL'; // Restore mode on watch
+                updateUI(); 
+            } 
             else { alert("Match Ended/Deleted."); exitWatchMode(); } 
         });
     }
@@ -1042,6 +1221,7 @@
     function resumeMatch() { 
         try {
             G = JSON.parse(localStorage.getItem('gully_active')); 
+            appMode = G.appMode || 'FULL'; // Restore Mode
             G.history = [];
             matchId = localStorage.getItem('gully_mid'); 
             document.getElementById('home-screen').style.display='none'; 
